@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/api/service"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -29,6 +30,47 @@ var (
 )
 
 func TestProjectionHandler_Trigger(t *testing.T) {
+	const pause = time.Millisecond
+
+	startCtx := call.WithTimestamp(context.Background())
+	start := call.FromContext(startCtx)
+
+	h := &ProjectionHandler{
+		Handler: Handler{
+			Eventstore: eventstore.NewEventstore(eventstore.TestConfig(
+				es_repo_mock.NewRepo(t).ExpectFilterEvents(
+					&repository.Event{
+						ID:                        "id",
+						Sequence:                  1,
+						PreviousAggregateSequence: 0,
+						CreationDate:              time.Now(),
+						Type:                      "test.added",
+						Version:                   "v1",
+						AggregateID:               "testid",
+						AggregateType:             "testAgg",
+					},
+				),
+			)),
+		},
+		ProjectionName: "test",
+		reduce:         testReduce(newTestStatement("testAgg", 1, 0)),
+		update:         testUpdate(t, 1, 0, nil),
+		searchQuery: testQuery(
+			eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+				AddQuery().
+				AggregateTypes("test").
+				Builder(),
+			5, nil,
+		),
+	}
+
+	time.Sleep(pause)
+	endCtx := h.Trigger(startCtx)
+	// check if the new context has a call timestamp that's later than start+pause.
+	assert.WithinRange(t, call.FromContext(endCtx), start.Add(pause), start.Add(pause+time.Second))
+}
+
+func TestProjectionHandler_TriggerErr(t *testing.T) {
 	type fields struct {
 		reduce     Reduce
 		update     Update
@@ -223,7 +265,8 @@ func TestProjectionHandler_Trigger(t *testing.T) {
 				searchQuery:    tt.fields.query,
 			}
 
-			err := h.Trigger(tt.args.ctx, tt.args.instances...)
+			// context timestamp is checked in [TestProjectionHandler_Trigger]
+			_, err := h.TriggerErr(tt.args.ctx, tt.args.instances...)
 			if !tt.want.isErr(err) {
 				t.Errorf("unexpected error %v", err)
 			}
@@ -342,6 +385,7 @@ func TestProjectionHandler_Process(t *testing.T) {
 				nil,
 				nil,
 				nil,
+				false,
 			)
 
 			index, err := h.Process(tt.args.ctx, tt.args.events...)
@@ -668,13 +712,13 @@ func TestProjection_schedule(t *testing.T) {
 		ctx context.Context
 	}
 	type fields struct {
-		reduce                  Reduce
-		update                  Update
-		eventstore              func(t *testing.T) *eventstore.Eventstore
-		lock                    *lockMock
-		unlock                  *unlockMock
-		query                   SearchQuery
-		handleInactiveInstances bool
+		reduce                Reduce
+		update                Update
+		eventstore            func(t *testing.T) *eventstore.Eventstore
+		lock                  *lockMock
+		unlock                *unlockMock
+		query                 SearchQuery
+		handleActiveInstances time.Duration
 	}
 	type want struct {
 		locksCount   int
@@ -711,7 +755,7 @@ func TestProjection_schedule(t *testing.T) {
 					),
 					)
 				},
-				handleInactiveInstances: false,
+				handleActiveInstances: 2 * time.Minute,
 			},
 			want{
 				locksCount:   0,
@@ -739,7 +783,7 @@ func TestProjection_schedule(t *testing.T) {
 					),
 					)
 				},
-				handleInactiveInstances: false,
+				handleActiveInstances: 2 * time.Minute,
 			},
 			want{
 				locksCount:   0,
@@ -771,7 +815,7 @@ func TestProjection_schedule(t *testing.T) {
 					firstErr: ErrLock,
 					canceled: make(chan bool, 1),
 				},
-				handleInactiveInstances: false,
+				handleActiveInstances: 2 * time.Minute,
 			},
 			want{
 				locksCount:   1,
@@ -803,9 +847,9 @@ func TestProjection_schedule(t *testing.T) {
 					firstErr: nil,
 					errWait:  100 * time.Millisecond,
 				},
-				unlock:                  &unlockMock{},
-				query:                   testQuery(nil, 0, ErrQuery),
-				handleInactiveInstances: false,
+				unlock:                &unlockMock{},
+				query:                 testQuery(nil, 0, ErrQuery),
+				handleActiveInstances: 2 * time.Minute,
 			},
 			want{
 				locksCount:   1,
@@ -837,7 +881,7 @@ func TestProjection_schedule(t *testing.T) {
 								}, {
 									Field:     repository.FieldCreationDate,
 									Operation: repository.OperationGreater,
-									Value:     now().Add(-2 * time.Hour),
+									Value:     now().Add(-2 * time.Minute),
 								}},
 								"206626268110651755",
 							).
@@ -855,10 +899,10 @@ func TestProjection_schedule(t *testing.T) {
 					firstErr: nil,
 					errWait:  100 * time.Millisecond,
 				},
-				unlock:                  &unlockMock{},
-				handleInactiveInstances: false,
-				reduce:                  testReduce(newTestStatement("aggregate1", 1, 0)),
-				update:                  testUpdate(t, 1, 1, nil),
+				unlock:                &unlockMock{},
+				handleActiveInstances: 2 * time.Minute,
+				reduce:                testReduce(newTestStatement("aggregate1", 1, 0)),
+				update:                testUpdate(t, 1, 1, nil),
 				query: testQuery(
 					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 						AddQuery().
@@ -894,6 +938,10 @@ func TestProjection_schedule(t *testing.T) {
 								Field:     repository.FieldInstanceID,
 								Operation: repository.OperationNotIn,
 								Value:     database.StringArray{""},
+							}, {
+								Field:     repository.FieldCreationDate,
+								Operation: repository.OperationGreater,
+								Value:     now().Add(-45 * time.Hour),
 							}}, "206626268110651755").
 							ExpectFilterEvents(&repository.Event{
 								AggregateType:             "quota",
@@ -909,10 +957,10 @@ func TestProjection_schedule(t *testing.T) {
 					firstErr: nil,
 					errWait:  100 * time.Millisecond,
 				},
-				unlock:                  &unlockMock{},
-				handleInactiveInstances: true,
-				reduce:                  testReduce(newTestStatement("aggregate1", 1, 0)),
-				update:                  testUpdate(t, 1, 1, nil),
+				unlock:                &unlockMock{},
+				handleActiveInstances: 45 * time.Hour,
+				reduce:                testReduce(newTestStatement("aggregate1", 1, 0)),
+				update:                testUpdate(t, 1, 1, nil),
 				query: testQuery(
 					eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 						AddQuery().
@@ -936,17 +984,17 @@ func TestProjection_schedule(t *testing.T) {
 					EventQueue: make(chan eventstore.Event, 10),
 					Eventstore: tt.fields.eventstore(t),
 				},
-				reduce:                  tt.fields.reduce,
-				update:                  tt.fields.update,
-				searchQuery:             tt.fields.query,
-				lock:                    tt.fields.lock.lock(),
-				unlock:                  tt.fields.unlock.unlock(),
-				triggerProjection:       time.NewTimer(0), // immediately run an iteration
-				requeueAfter:            time.Hour,        // run only one iteration
-				concurrentInstances:     1,
-				handleInactiveInstances: tt.fields.handleInactiveInstances,
-				retries:                 0,
-				nowFunc:                 now,
+				reduce:                tt.fields.reduce,
+				update:                tt.fields.update,
+				searchQuery:           tt.fields.query,
+				lock:                  tt.fields.lock.lock(),
+				unlock:                tt.fields.unlock.unlock(),
+				triggerProjection:     time.NewTimer(0), // immediately run an iteration
+				requeueAfter:          time.Hour,        // run only one iteration
+				concurrentInstances:   1,
+				handleActiveInstances: tt.fields.handleActiveInstances,
+				retries:               0,
+				nowFunc:               now,
 			}
 			ctx, cancel := context.WithCancel(tt.args.ctx)
 			go func() {

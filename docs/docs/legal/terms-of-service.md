@@ -6,7 +6,7 @@ custom_edit_url: null
 
 ### Introduction
 
-CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office in Teufener Strasse 19, 9000 St. Gallen, Switzerland, offers "Identity and Access Management as service" with the brand name "ZITADEL Cloud Services" and all of our Websites (**Services** or **ZITADEL Cloud**).
+CAOS Ltd. (**"We"**, **CAOS AG**, or simply **CAOS**), with head office in Lerchenfeldstrasse 3, 9014 St. Gallen, Switzerland, offers "Identity and Access Management as service" with the brand name "ZITADEL Cloud Services" and all of our Websites (**Services** or **ZITADEL Cloud**).
 
 The customer relationship (**Framework Agreement** or **The Agreement**) is created by the **Customer** (**"you"**) by creating a user or organization within the ZITADEL Cloud Service. On the basis of this Framework Agreement you may then choose to make use of payable services (**Subscription**) as you wish, i.e. you may book services, options and packages yourself at any time (**Booking**, **Purchase Order**) and subsequently terminate them.
 
@@ -24,10 +24,6 @@ The following policies complement the TOS. When accepting the TOS, you accept th
 * [**Privacy Policy**](privacy-policy) - How we process personal data on our websites and products
 * [**Acceptable Use Policy**](acceptable-use-policy) - What we understand as acceptable and fair use of our Services
 * [**Rate Limit Policy**](rate-limit-policy) - How we avoid overloads of our services
-
-This Agreement is extended with additional terms, in case your Subscription requires a Dedicated Instance. When you enter the Agreement with us, you accept these additional agreements.
-
-* [**Dedicated Instance Terms**](terms-of-service-dedicated) - How we provide our services for a dedicated instance
 
 ### Alterations
 
@@ -195,7 +191,7 @@ Should any provision of these TOS be or become invalid, this shall not affect th
 
 These TOS shall enter into force as of 15.07.2022.
 
-Last revised: June 14, 2022
+Last revised: May 12, 2023
 
 ### Amendments
 

@@ -877,8 +877,9 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Get Identity Provider (IDP) by ID";
-            description: "Returns an identity provider (social/enterprise login) by its ID e.g Google, AzureAD, etc."
+            summary: "Deprecated: Get Identity Provider (IDP) by ID";
+            description: "Returns an identity provider (social/enterprise login) by its ID e.g Google, AzureAD, etc.";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -911,8 +912,9 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Search Identity Providers (IDP)";
-            description: "Returns a list of identity providers (social/enterprise login) configured on an instance level. e.g Google, AzureAD, etc."
+            summary: "Deprecated: Search Identity Providers (IDP)";
+            description: "Returns a list of identity providers (social/enterprise login) configured on an instance level. e.g Google, AzureAD, etc.";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -945,8 +947,9 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Add OIDC Identity Provider (IDP)";
-            description: "Create a new identity provider configuration to enable your users to log in with social/enterprise login. The provider has to be OIDC compliant."
+            summary: "Deprecated: Add OIDC Identity Provider (IDP)";
+            description: "Create a new identity provider configuration to enable your users to log in with social/enterprise login. The provider has to be OIDC compliant.";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -979,8 +982,9 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Add JWT Identity Provider (IDP)";
-            description: "Create a new identity provider configuration to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token."
+            summary: "Deprecated: Add JWT Identity Provider (IDP)";
+            description: "Create a new identity provider configuration to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token.";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -1013,8 +1017,9 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Update Identity Provider (IDP)";
-            description: "Update an existing IDP. All fields are updated. If you do not send a value in a field, it will be empty afterward."
+            summary: "Deprecated: Update Identity Provider (IDP)";
+            description: "Update an existing IDP. All fields are updated. If you do not send a value in a field, it will be empty afterward.";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -1046,8 +1051,9 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Deactivate Identity Provider (IDP)";
-            description: "Sets the state of the provider to inactive. It can only be called for the provider with the state active. Users will not be able to log in with the given provider afterward. It might cause troubles if it is the only authentication method of the user."
+            summary: "Deprecated: Deactivate Identity Provider (IDP)";
+            description: "Sets the state of the provider to inactive. It can only be called for the provider with the state active. Users will not be able to log in with the given provider afterward. It might cause troubles if it is the only authentication method of the user.";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -1079,8 +1085,9 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Reactivate Identity Provider (IDP)";
-            description: "Sets the state of the provider to active. It can only be called for providers with the state inactive. Users will not be able to log in again with the given provider."
+            summary: "Deprecated: Reactivate Identity Provider (IDP)";
+            description: "Sets the state of the provider to active. It can only be called for providers with the state inactive. Users will not be able to log in again with the given provider.";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -1112,8 +1119,9 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Remove Identity Provider (IDP)";
-            description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to log in with the provider afterward. If it is their only authentication possibility it might cause problems."
+            summary: "Deprecated: Remove Identity Provider (IDP)";
+            description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to log in with the provider afterward. If it is their only authentication possibility it might cause problems.";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -1146,8 +1154,9 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Update OIDC Identity Provider (IDP)";
-            description: "Update the OIDC-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward."
+            summary: "Deprecated: Update OIDC Identity Provider (IDP)";
+            description: "Update the OIDC-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward.";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -1191,8 +1200,9 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
-            summary: "Update JWT Identity Provider (IDP)";
-            description: "Update the JWT-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward."
+            summary: "Deprecated: Update JWT Identity Provider (IDP)";
+            description: "Update the JWT-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward.";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -1235,6 +1245,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.read"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "List Identity Providers";
+            description: "Returns a list of identity providers (social/enterprise login) configured on an instance level. e.g Google, AzureAD, etc.";
+        };
     }
 
     // Returns an identity provider of the instance
@@ -1245,6 +1261,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Get Identity Provider By ID";
+            description: "";
         };
     }
 
@@ -1258,6 +1280,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add Generic OAuth Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing OAuth2 identity provider on the instance
@@ -1269,6 +1297,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update Generic OAuth Identity Provider";
+            description: "";
         };
     }
 
@@ -1282,6 +1316,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add Generic OIDC Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing OIDC identity provider on the instance
@@ -1293,6 +1333,30 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update Generic OIDC Identity Provider";
+            description: "";
+        };
+    }
+
+    // Migrate an existing OIDC identity provider on the instance
+    rpc MigrateGenericOIDCProvider(MigrateGenericOIDCProviderRequest) returns (MigrateGenericOIDCProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/generic_oidc/{id}/_migrate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Migrate Generic OIDC Identity Provider";
+            description: "";
         };
     }
 
@@ -1306,6 +1370,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add JWT Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing JWT identity provider on the instance
@@ -1317,6 +1387,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update JWT Identity Provider";
+            description: "";
         };
     }
 
@@ -1330,6 +1406,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add AzureAD Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing Azure AD identity provider on the instance
@@ -1341,6 +1423,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update AzureAD Identity Provider";
+            description: "";
         };
     }
 
@@ -1354,6 +1442,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add GitHub Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing GitHub identity provider on the instance
@@ -1365,6 +1459,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update GitHub Identity Provider";
+            description: "";
         };
     }
 
@@ -1378,6 +1478,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add GitHub Enterprise Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing GitHub Enterprise Server identity provider on the instance
@@ -1389,6 +1495,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update GitHub Enterprise Identity Provider";
+            description: "";
         };
     }
 
@@ -1402,6 +1514,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add GitLab Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing GitLab identity provider on the instance
@@ -1413,6 +1531,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update GitLab Identity Provider";
+            description: "";
         };
     }
 
@@ -1426,6 +1550,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add GitLab Selfhost Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing self hosted GitLab identity provider on the instance
@@ -1437,6 +1567,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update GitLab Selfhost Identity Provider";
+            description: "";
         };
     }
 
@@ -1450,6 +1586,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add Google Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing Google identity provider on the instance
@@ -1461,6 +1603,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update Google Identity Provider";
+            description: "";
         };
     }
 
@@ -1474,6 +1622,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add LDAP Identity Provider";
+            description: "";
+        };
     }
 
     // Change an existing LDAP identity provider on the instance
@@ -1486,6 +1640,12 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update LDAP Identity Provider";
+            description: "";
+        };
     }
 
     // Remove an identity provider
@@ -1497,6 +1657,12 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Delete Identity Provider";
+            description: "";
         };
     }
 
@@ -2653,7 +2819,7 @@ service AdminService {
 
     rpc ResetCustomPasswordResetMessageTextToDefault(ResetCustomPasswordResetMessageTextToDefaultRequest) returns (ResetCustomPasswordResetMessageTextToDefaultResponse) {
         option (google.api.http) = {
-            delete: "/text/message/verifyemail/{language}"
+            delete: "/text/message/passwordreset/{language}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2794,6 +2960,138 @@ service AdminService {
             tags: "Message Texts";
             summary: "Reset Custom Verify Phone Message Text to Default";
             description: "Removes the custom text of the verify-phone message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+        };
+    }
+
+
+    rpc GetDefaultVerifySMSOTPMessageText(GetDefaultVerifySMSOTPMessageTextRequest) returns (GetDefaultVerifySMSOTPMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/verifysmsotp/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Verify SMS OTP Message Text";
+            description: "Get the default text of the verify SMS OTP message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+        };
+    }
+
+    rpc GetCustomVerifySMSOTPMessageText(GetCustomVerifySMSOTPMessageTextRequest) returns (GetCustomVerifySMSOTPMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/verifysmsotp/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Verify SMS OTP Message Text";
+            description: "Get the custom text of the verify SMS OTP message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+        };
+    }
+
+    rpc SetDefaultVerifySMSOTPMessageText(SetDefaultVerifySMSOTPMessageTextRequest) returns (SetDefaultVerifySMSOTPMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/verifysmsotp/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Default Verify SMS OTP Reset Message Text";
+            description: "Set the custom text of the verify SMS OTP user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+        };
+    }
+
+    rpc ResetCustomVerifySMSOTPMessageTextToDefault(ResetCustomVerifySMSOTPMessageTextToDefaultRequest) returns (ResetCustomVerifySMSOTPMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/verifysmsotp/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Verify SMS OTP Message Text to Default";
+            description: "Removes the custom text of the verify SMS OTP message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+        };
+    }
+
+
+    rpc GetDefaultVerifyEmailOTPMessageText(GetDefaultVerifyEmailOTPMessageTextRequest) returns (GetDefaultVerifyEmailOTPMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/verifyemailotp/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Verify SMS OTP Message Text";
+            description: "Get the default text of the verify Email OTP message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+        };
+    }
+
+    rpc GetCustomVerifyEmailOTPMessageText(GetCustomVerifyEmailOTPMessageTextRequest) returns (GetCustomVerifyEmailOTPMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/verifyemailotp/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Verify SMS OTP Message Text";
+            description: "Get the custom text of the Email OTP message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
+        };
+    }
+
+    rpc SetDefaultVerifyEmailOTPMessageText(SetDefaultVerifyEmailOTPMessageTextRequest) returns (SetDefaultVerifyEmailOTPMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/verifyemailotp/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Default Verify SMS OTP Reset Message Text";
+            description: "Set the custom text of the Email OTP user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
+        };
+    }
+
+    rpc ResetCustomVerifyEmailOTPMessageTextToDefault(ResetCustomVerifyEmailOTPMessageTextToDefaultRequest) returns (ResetCustomVerifyEmailOTPMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/verifyemailotp/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Verify SMS OTP Message Text to Default";
+            description: "Removes the custom text of the Email OTP message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
     }
 
@@ -3544,6 +3842,14 @@ message AddSMTPConfigRequest {
             example: "\"this-is-my-password\"";
         }
     ];
+    string reply_to_address = 7 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"replyto@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message AddSMTPConfigResponse {
@@ -3583,6 +3889,14 @@ message UpdateSMTPConfigRequest {
     string user = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+        }
+    ];
+    string reply_to_address = 6 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"replyto@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
         }
     ];
 }
@@ -4456,15 +4770,62 @@ message GetProviderByIDResponse {
 }
 
 message AddGenericOAuthProviderRequest {
-    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string authorization_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string token_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string user_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"My Provider\"";
+        }
+    ];
+    string client_id = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "client id generated by the identity provider";
+        }
+    ];
+    string client_secret = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-secret\"";
+            description: "Client secret generated by the identity provider";
+        }
+    ];
+    string authorization_endpoint = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/o/oauth2/v2/auth\"";
+            description: "The endpoint where ZITADEL send the user to authenticate";
+        }
+    ];
+    string token_endpoint = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://oauth2.googleapis.com/token\"";
+            description: "The endpoint where ZITADEL can get the token";
+        }
+    ];
+    string user_endpoint = 6 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://openidconnect.googleapis.com/v1/userinfo\"";
+            description: "The endpoint where ZITADEL can get the user information";
+        }
+    ];
+    repeated string scopes = 7 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request on the identity provider";
+        }
+    ];
     // identifying attribute of the user in the response of the user_endpoint
-    string id_attribute = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id_attribute = 8 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"user_id\"";
+            description: "Identifying attribute of the user in the response of the user_endpoint";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 9;
 }
 
@@ -4475,16 +4836,63 @@ message AddGenericOAuthProviderResponse {
 
 message UpdateGenericOAuthProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"My Provider\"";
+        }
+    ];
+    string client_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by the identity provider";
+        }
+    ];
     // client_secret will only be updated if provided
-    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
-    string authorization_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string token_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string user_endpoint = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 8 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string client_secret = 4 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-secret\"";
+            description: "Client secret will only be updated if provided";
+        }
+    ];
+    string authorization_endpoint = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/o/oauth2/v2/auth\"";
+            description: "The endpoint where ZITADEL send the user to authenticate";
+        }
+    ];
+    string token_endpoint = 6 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://oauth2.googleapis.com/token\"";
+            description: "The endpoint where ZITADEL can get the token";
+        }
+    ];
+    string user_endpoint = 7 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://openidconnect.googleapis.com/v1/userinfo\"";
+            description: "The endpoint where ZITADEL can get the user information";
+        }
+    ];
+    repeated string scopes = 8 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request on the identity provider";
+        }
+    ];
     // identifying attribute of the user in the response of the user_endpoint
-    string id_attribute = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id_attribute = 9 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"user_id\"";
+            description: "Identifying attribute of the user in the response of the user_endpoint";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 10;
 }
 
@@ -4493,11 +4901,40 @@ message UpdateGenericOAuthProviderResponse {
 }
 
 message AddGenericOIDCProviderRequest {
-    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Google\"";
+        }
+    ];
+    string issuer = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/\"";
+            description: "the OIDC issuer of the identity provider";
+        }
+    ];
+    string client_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "client id generated by the identity provider";
+        }
+    ];
+    string client_secret = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "secret generated by the identity provider"
+        }
+    ];
+    repeated string scopes = 5 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "the scopes requested by ZITADEL during the request on the identity provider";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 6;
     bool is_id_token_mapping = 7;
 }
@@ -4508,13 +4945,47 @@ message AddGenericOIDCProviderResponse {
 }
 
 message UpdateGenericOIDCProviderRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string issuer = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    string name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Google\"";
+        }
+    ];
+    string issuer = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://accounts.google.com/\"";
+            description: "the OIDC issuer of the identity provider";
+        }
+    ];
+    string client_id = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "client id generated by the identity provider";
+        }
+    ];
     // client_secret will only be updated if provided
-    string client_secret = 5 [(validate.rules).string = {max_len: 200}];
-    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string client_secret = 5 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "client secret will only be updated if provided";
+        }
+    ];
+    repeated string scopes = 6 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "the scopes requested by ZITADEL during the request on the identity provider";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 7;
     bool is_id_token_mapping = 8;
 }
@@ -4523,8 +4994,30 @@ message UpdateGenericOIDCProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message MigrateGenericOIDCProviderRequest{
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    oneof template {
+        AddAzureADProviderRequest azure = 2;
+        AddGoogleProviderRequest google = 3;
+    }
+}
+
+message MigrateGenericOIDCProviderResponse{
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message AddJWTProviderRequest {
-    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"My Provider\"";
+        }
+    ];
     string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string jwt_endpoint = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string keys_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -4539,7 +5032,12 @@ message AddJWTProviderResponse {
 
 message UpdateJWTProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"My Provider\"";
+        }
+    ];
     string issuer = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string jwt_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string keys_endpoint = 5 [(validate.rules).string = {max_len: 200}];
@@ -4552,13 +5050,44 @@ message UpdateJWTProviderResponse {
 }
 
 message AddAzureADProviderRequest {
-    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Azure AD\"";
+        }
+    ];
+    string client_id = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "client id generated by the Azure AD";
+        }
+    ];
+    string client_secret = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "client secret generated by the Azure AD";
+        }
+    ];
     // if not provided the `common` tenant will be used
-    zitadel.idp.v1.AzureADTenant tenant = 4;
-    bool email_verified = 5;
-    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.AzureADTenant tenant = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines what kind of accounts are allowed to authenticate (Personal, Organizational, All). If not provided the `common` tenant will be used (All accounts)";
+        }
+    ];
+    bool email_verified = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in ZITADEL (no verification emails will be sent)";
+        }
+    ];
+    repeated string scopes = 6 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\", \"User.Read\"]";
+            description: "the scopes requested by ZITADEL during the request to Azure AD";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 7;
 }
 
@@ -4569,14 +5098,45 @@ message AddAzureADProviderResponse {
 
 message UpdateAzureADProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Azure AD\"";
+        }
+    ];
+    string client_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by the Azure AD";
+        }
+    ];
     // client_secret will only be updated if provided
-    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
+    string client_secret = 4 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client_secret will only be updated if provided";
+        }
+    ];
     // if not provided the `common` tenant will be used
-    zitadel.idp.v1.AzureADTenant tenant = 5;
-    bool email_verified = 6;
-    repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    zitadel.idp.v1.AzureADTenant tenant = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Defines what kind of accounts are allowed to authenticate (Personal, Organizational, All). If not provided the `common` tenant will be used (All accounts)";
+        }
+    ];
+    bool email_verified = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Azure AD doesn't send if the email has been verified. Enable this if the user email should always be added verified in ZITADEL (no verification emails will be sent)";
+        }
+    ];
+    repeated string scopes = 7 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\", \"User.Read\"]";
+            description: "the scopes requested by ZITADEL during the request to Azure AD";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 8;
 }
 
@@ -4586,10 +5146,34 @@ message UpdateAzureADProviderResponse {
 
 message AddGitHubProviderRequest {
     // GitHub will be used as default, if no name is provided
-    string name = 1 [(validate.rules).string = {max_len: 200}];
-    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 4 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"GitHub\"";
+            description: "GitHub will be used as default, if no name is provided";
+        }
+    ];
+    string client_id = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by GitHub";
+        }
+    ];
+    string client_secret = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client secret generated by the GitHub";
+        }
+    ];
+    repeated string scopes = 4 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request to GitHub";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 5;
 }
 
@@ -4600,11 +5184,34 @@ message AddGitHubProviderResponse {
 
 message UpdateGitHubProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {max_len: 200}];
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"GitHub\"";
+        }
+    ];
+    string client_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by GitHub";
+        }
+    ];
     // client_secret will only be updated if provided
-    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
-    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string client_secret = 4 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client_secret will only be updated if provided";
+        }
+    ];
+    repeated string scopes = 5 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request to GitHub";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 6;
 }
 
@@ -4613,13 +5220,36 @@ message UpdateGitHubProviderResponse {
 }
 
 message AddGitHubEnterpriseServerProviderRequest {
-    string client_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string client_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by GitHub";
+        }
+    ];
+    string name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"GitHub\"";
+        }
+    ];
+    string client_secret = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client secret generated by GitHub";
+        }
+    ];
     string authorization_endpoint = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string token_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 7 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    repeated string scopes = 7 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request to GitHub";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 8;
 }
 
@@ -4630,14 +5260,37 @@ message AddGitHubEnterpriseServerProviderResponse {
 
 message UpdateGitHubEnterpriseServerProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"GitHub\"";
+        }
+    ];
+    string client_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by GitHub";
+        }
+    ];
     // client_secret will only be updated if provided
-    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
+    string client_secret = 4 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client secret will only be updated if provided";
+        }
+    ];
     string authorization_endpoint = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string token_endpoint = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string user_endpoint = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 8 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    repeated string scopes = 8 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request to GitHub";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 9;
 }
 
@@ -4647,10 +5300,34 @@ message UpdateGitHubEnterpriseServerProviderResponse {
 
 message AddGitLabProviderRequest {
     // GitLab will be used as default, if no name is provided
-    string name = 1 [(validate.rules).string = {max_len: 200}];
-    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 4 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"GitLab\"";
+            description: "GitLab will be used as default, if no name is provided";
+        }
+    ];
+    string client_id = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by GitLab";
+        }
+    ];
+    string client_secret = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client secret generated by GitLab";
+        }
+    ];
+    repeated string scopes = 4 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request to GitLab";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 5;
 }
 
@@ -4661,11 +5338,35 @@ message AddGitLabProviderResponse {
 
 message UpdateGitLabProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {max_len: 200}];
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"GitLab\"";
+            description: "GitLab will be used as default, if no name is provided";
+        }
+    ];
+    string client_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by GitLab";
+        }
+    ];
     // client_secret will only be updated if provided
-    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
-    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string client_secret = 4 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client secret will only be updated if provided";
+        }
+    ];
+    repeated string scopes = 5 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request to GitLab";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 6;
 }
 
@@ -4675,10 +5376,33 @@ message UpdateGitLabProviderResponse {
 
 message AddGitLabSelfHostedProviderRequest {
     string issuer = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"GitLab\"";
+        }
+    ];
+    string client_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by GitLab";
+        }
+    ];
+    string client_secret = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client secret generated by GitLab";
+        }
+    ];
+    repeated string scopes = 5 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request to GitLab";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 6;
 }
 
@@ -4690,11 +5414,34 @@ message AddGitLabSelfHostedProviderResponse {
 message UpdateGitLabSelfHostedProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string issuer = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_id = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"GitLab\"";
+        }
+    ];
+    string client_id = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by GitLab";
+        }
+    ];
     // client_secret will only be updated if provided
-    string client_secret = 5 [(validate.rules).string = {max_len: 200}];
-    repeated string scopes = 6 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string client_secret = 5 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client secret will only be updated if provided";
+        }
+    ];
+    repeated string scopes = 6 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request to GitLab";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 7;
 }
 
@@ -4704,10 +5451,34 @@ message UpdateGitLabSelfHostedProviderResponse {
 
 message AddGoogleProviderRequest {
     // Google will be used as default, if no name is provided
-    string name = 1 [(validate.rules).string = {max_len: 200}];
-    string client_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string client_secret = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    repeated string scopes = 4 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Google\"";
+            description: "Google will be used as default, if no name is provided";
+        }
+    ];
+    string client_id = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by Google";
+        }
+    ];
+    string client_secret = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client secret generated by Google";
+        }
+    ];
+    repeated string scopes = 4 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request to Google";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 5;
 }
 
@@ -4718,11 +5489,34 @@ message AddGoogleProviderResponse {
 
 message UpdateGoogleProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string name = 2 [(validate.rules).string = {max_len: 200}];
-    string client_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Google\"";
+        }
+    ];
+    string client_id = 3 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"client-id\"";
+            description: "Client id generated by Google";
+        }
+    ];
     // client_secret will only be updated if provided
-    string client_secret = 4 [(validate.rules).string = {max_len: 200}];
-    repeated string scopes = 5 [(validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}}];
+    string client_secret = 4 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"secret\"";
+            description: "Client secret will only be updated if provided";
+        }
+    ];
+    repeated string scopes = 5 [
+        (validate.rules).repeated = {max_items: 20, items: {string: {min_len: 1, max_len: 100}}},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"openid\", \"profile\", \"email\"]";
+            description: "The scopes requested by ZITADEL during the request to Google";
+        }
+    ];
     zitadel.idp.v1.Options provider_options = 6;
 }
 
@@ -5218,6 +6012,11 @@ message UpdateLoginPolicyRequest {
     bool disable_login_with_phone = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
+        }
+    ];
+    bool force_mfa_local_only = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
         }
     ];
 }
@@ -5836,6 +6635,132 @@ message ResetCustomVerifyPhoneMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message GetCustomVerifySMSOTPMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomVerifySMSOTPMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetDefaultVerifySMSOTPMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultVerifySMSOTPMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultVerifySMSOTPMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string text = 2 [
+        (validate.rules).string = {max_len: 800},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Please visit {{ .VerifyURL }} or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
+            max_length: 800;
+        }
+    ];
+}
+
+message SetDefaultVerifySMSOTPMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomVerifySMSOTPMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomVerifySMSOTPMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetCustomVerifyEmailOTPMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomVerifyEmailOTPMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetDefaultVerifyEmailOTPMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultVerifyEmailOTPMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultVerifyEmailOTPMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL - One-time Password\""
+            max_length: 200;
+        }
+    ];
+    string pre_header = 3 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Verify One-time Password \""
+            max_length: 200;
+        }
+    ];
+    string subject = 4 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Verify One-time Password\""
+            max_length: 200;
+        }
+    ];
+    string greeting = 5  [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Hello {{.FirstName}} {{.LastName}},\""
+            max_length: 200;
+        }
+    ];
+    string text = 6 [
+        (validate.rules).string = {max_len: 800},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Please use the \\\"Authenticate\\\" button or copy the one-time password {{.OTP}} and paste it to to the authentication screen in order to authenticate at ZITADEL within the next five minutes.\""
+            max_length: 800;
+        }
+    ];
+    string button_text = 7 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Authenticate\""
+            max_length: 200;
+        }
+    ];
+    string footer_text = 8 [(validate.rules).string = {max_len: 200}];
+}
+
+message SetDefaultVerifyEmailOTPMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomVerifyEmailOTPMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomVerifyEmailOTPMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultDomainClaimedMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -6447,6 +7372,9 @@ message DataOrg {
 
     repeated zitadel.v1.v1.DataAppKey app_keys = 35;
     repeated zitadel.v1.v1.DataMachineKey machine_keys = 36;
+
+    repeated zitadel.management.v1.SetCustomVerifySMSOTPMessageTextRequest verify_sms_otp_messages = 37;
+    repeated zitadel.management.v1.SetCustomVerifyEmailOTPMessageTextRequest verify_email_otp_messages = 38;
 }
 
 message ImportDataResponse{

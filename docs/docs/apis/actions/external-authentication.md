@@ -2,7 +2,7 @@
 title: External Authentication Flow
 ---
 
-This flow is executed if the user logs in using an [identity provider](/guides/integrate/identity-providers/introduction.md) or using a [jwt token](/concepts/structure/jwt_idp).
+This flow is executed if the user logs in using an [identity provider](/guides/integrate/identity-providers) or using a [jwt token](/concepts/structure/jwt_idp).
 
 ## Post Authentication
 
@@ -13,13 +13,13 @@ A user has authenticated externally. ZITADEL retrieved and mapped the external i
 - `ctx`  
 The first parameter contains the following fields
   - `accessToken` *string*  
-    The access token which will be returned to the user. This can be an opaque token or a JWT
+    The access token returned by the identity provider. This can be an opaque token or a JWT
   - `claimsJSON()` [*idTokenClaims*](../openidoauth/claims)  
     Returns all claims of the id token
   - `getClaim(key)` *Any*  
     Returns the requested [id token claim](../openidoauth/claims)
   - `idToken` *string*  
-    The id token which will be returned to the user
+    The id token provided by the identity provider.
   - `v1`
     - `externalUser()` [*externalUser*](./objects#external-user)
     - `authError` *string*  
@@ -36,9 +36,9 @@ The first parameter contains the following fields
       - `appendMetadata(string, Any)`  
         The first parameter represents the key and the second a value which will be stored
   - `setFirstName(string)`  
-    Sets the first name
+    Sets the given name
   - `setLastName(string)`  
-    Sets the last name
+    Sets the family name
   - `setNickName(string)`  
     Sets the nickname
   - `setDisplayName(string)`  
@@ -75,9 +75,9 @@ A user selected **Register** on the overview page after external authentication.
   - `metadata`  
     Array of [*metadata*](./objects#metadata-with-value-as-bytes). This function is deprecated, please use `api.v1.user.appendMetadata`
   - `setFirstName(string)`  
-    Sets the first name
+    Sets the given name
   - `setLastName(string)`  
-    Sets the last name
+    Sets the family name
   - `setNickName(string)`  
     Sets the nick name
   - `setDisplayName(string)`  

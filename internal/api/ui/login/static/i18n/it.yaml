@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: L'autenticazione a due fattori offre un'ulteriore sicurezza al vostro account utente. Questo garantisce che solo voi possiate accedere al vostro account.
   Provider0: App Autenticatore (ad esempio Google/Microsoft Authenticator, Authy)
   Provider1: Dipende dal dispositivo (ad es. FaceID, Windows Hello, impronta digitale)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   NextButtonText: Avanti
   SkipButtonText: salta
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Codice
   NextButtonText: Avanti
   CancelButtonText: annulla
+
+InitMFASMS:
+  Title: Verificazione a 2 fattori
+  DescriptionPhone: Crea il tuo 2 fattori. Inserisci il tuo numero di telefono per verificarlo.
+  DescriptionCode: Crea il tuo 2 fattori. Inserisci il codice ricevuto per verificare il tuo numero di telefono.
+  PhoneLabel: Numero di telefono
+  CodeLabel: Codice
+  EditButtonText: Modifica
+  ResendButtonText: Reinvia codice
+  NextButtonText: Avanti
 
 InitMFAU2F:
   Title: Aggiungi chiave di sicurezza
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: App Autenticatore (ad esempio Google/Microsoft Authenticator, Authy)
   Provider1: Dipende dal dispositivo (ad es. FaceID, Windows Hello, impronta digitale)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   ChooseOther: o scegli un'altra opzione
 
 VerifyMFAOTP:
   Title: Verificazione fattore
   Description: Verifica il tuo secondo fattore con la tua app
   CodeLabel: Codice
+  NextButtonText: Avanti
+
+VerifyOTP:
+  Title: Verificazione fattore
+  Description: Verifica il tuo secondo fattore con la tua app
+  CodeLabel: Codice
+  ResendButtonText: Reinvia codice
   NextButtonText: Avanti
 
 VerifyMFAU2F:
@@ -221,6 +242,10 @@ RegistrationUser:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -253,6 +278,10 @@ ExternalRegistrationUserOverview:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -313,6 +342,28 @@ ExternalNotFound:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+
+DeviceAuth:
+  Title: Autorizzazione del dispositivo
+  UserCode:
+    Label: Codice utente
+    Description: Inserire il codice utente presentato sul dispositivo.
+    ButtonNext: prossimo
+  Action:
+    Description: Concedi l'accesso al dispositivo.
+    GrantDevice: stai per concedere il dispositivo
+    AccessToScopes: accesso ai seguenti ambiti
+    Button:
+      Allow: permettere
+      Deny: negare
+  Done:
+    Description: Fatto.
+    Approved: Autorizzazione del dispositivo approvata. Ora puoi tornare al dispositivo.
+    Denied: Autorizzazione dispositivo negata. Ora puoi tornare al dispositivo.
 
 Footer:
   PoweredBy: Alimentato da
@@ -373,6 +424,7 @@ Errors:
       Empty: La password è vuota
       Invalid: La password non è valida
       InvalidAndLocked: La password non è valida e l'utente è bloccato, contatta il tuo amministratore.
+      NotChanged: Password non modificata
     UsernameOrPassword:
       Invalid: Il nome utente o la password non sono validi
     PasswordComplexityPolicy:
@@ -422,5 +474,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: la registrazione non è consentita.
+  DeviceAuth:
+    NotExisting: Il codice utente non esiste
 
 optional: (opzionale)

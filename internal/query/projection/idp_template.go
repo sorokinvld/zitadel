@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	IDPTemplateTable                 = "projections.idp_templates4"
+	IDPTemplateTable                 = "projections.idp_templates5"
 	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
 	IDPTemplateOIDCTable             = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
 	IDPTemplateJWTTable              = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
@@ -348,6 +348,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceOIDCIDPChanged,
 				},
 				{
+					Event:  instance.OIDCIDPMigratedAzureADEventType,
+					Reduce: p.reduceOIDCIDPMigratedAzureAD,
+				},
+				{
+					Event:  instance.OIDCIDPMigratedGoogleEventType,
+					Reduce: p.reduceOIDCIDPMigratedGoogle,
+				},
+				{
 					Event:  instance.JWTIDPAddedEventType,
 					Reduce: p.reduceJWTIDPAdded,
 				},
@@ -436,6 +444,10 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceLDAPIDPChanged,
 				},
 				{
+					Event:  instance.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPConfigRemoved,
+				},
+				{
 					Event:  instance.IDPRemovedEventType,
 					Reduce: p.reduceIDPRemoved,
 				},
@@ -463,6 +475,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.OIDCIDPChangedEventType,
 					Reduce: p.reduceOIDCIDPChanged,
+				},
+				{
+					Event:  org.OIDCIDPMigratedAzureADEventType,
+					Reduce: p.reduceOIDCIDPMigratedAzureAD,
+				},
+				{
+					Event:  org.OIDCIDPMigratedGoogleEventType,
+					Reduce: p.reduceOIDCIDPMigratedGoogle,
 				},
 				{
 					Event:  org.JWTIDPAddedEventType,
@@ -551,6 +571,10 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.LDAPIDPChangedEventType,
 					Reduce: p.reduceLDAPIDPChanged,
+				},
+				{
+					Event:  org.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPConfigRemoved,
 				},
 				{
 					Event:  org.IDPRemovedEventType,
@@ -744,6 +768,106 @@ func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*h
 	return crdb.NewMultiStatement(
 		&idpEvent,
 		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.OIDCIDPMigratedAzureADEvent
+	switch e := event.(type) {
+	case *org.OIDCIDPMigratedAzureADEvent:
+		idpEvent = e.OIDCIDPMigratedAzureADEvent
+	case *instance.OIDCIDPMigratedAzureADEvent:
+		idpEvent = e.OIDCIDPMigratedAzureADEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeAzureAD),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(OIDCIDCol, idpEvent.ID),
+				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(AzureADIDCol, idpEvent.ID),
+				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
+				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
+				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
+			},
+			crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.OIDCIDPMigratedGoogleEvent
+	switch e := event.(type) {
+	case *org.OIDCIDPMigratedGoogleEvent:
+		idpEvent = e.OIDCIDPMigratedGoogleEvent
+	case *instance.OIDCIDPMigratedGoogleEvent:
+		idpEvent = e.OIDCIDPMigratedGoogleEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
+	}
+
+	return crdb.NewMultiStatement(
+		&idpEvent,
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeGoogle),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+		crdb.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(OIDCIDCol, idpEvent.ID),
+				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(GoogleIDCol, idpEvent.ID),
+				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
+				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
+				handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)),
+			},
+			crdb.WithTableSuffix(IDPTemplateGoogleSuffix),
+		),
 	), nil
 }
 
@@ -1732,6 +1856,25 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 	return crdb.NewMultiStatement(
 		&idpEvent,
 		ops...,
+	), nil
+}
+func (p *idpTemplateProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idpconfig.IDPConfigRemovedEvent
+	switch e := event.(type) {
+	case *org.IDPConfigRemovedEvent:
+		idpEvent = e.IDPConfigRemovedEvent
+	case *instance.IDPConfigRemovedEvent:
+		idpEvent = e.IDPConfigRemovedEvent
+	default:
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAFet", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
+	}
+
+	return crdb.NewDeleteStatement(
+		&idpEvent,
+		[]handler.Condition{
+			handler.NewCond(IDPTemplateIDCol, idpEvent.ConfigID),
+			handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+		},
 	), nil
 }
 

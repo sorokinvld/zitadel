@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -77,7 +78,7 @@ func addProjectMemberWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[ProjectMemberOwnerRemovedUser.identifier()] = false
 }
 
-func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQuery, withOwnerRemoved bool) (_ *Members, err error) {
+func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQuery, withOwnerRemoved bool) (members *Members, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -97,14 +98,14 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 		return nil, err
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		members, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-uh6pj", "Errors.Internal")
 	}
-	members, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	members.LatestSequence = currentSequence
 	return members, err
 }
@@ -124,10 +125,12 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			HumanDisplayNameCol.identifier(),
 			MachineNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
+			UserTypeCol.identifier(),
 			countColumn.identifier(),
 		).From(projectMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, ProjectMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, ProjectMemberUserID)).
+			LeftJoin(join(UserIDCol, ProjectMemberUserID)).
 			LeftJoin(join(LoginNameUserIDCol, ProjectMemberUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
@@ -147,6 +150,7 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 					displayName        = sql.NullString{}
 					machineName        = sql.NullString{}
 					avatarURL          = sql.NullString{}
+					userType           = sql.NullInt32{}
 				)
 
 				err := rows.Scan(
@@ -163,6 +167,7 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 					&displayName,
 					&machineName,
 					&avatarURL,
+					&userType,
 
 					&count,
 				)
@@ -181,6 +186,7 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 				} else {
 					member.DisplayName = machineName.String
 				}
+				member.UserType = domain.UserType(userType.Int32)
 
 				members = append(members, member)
 			}

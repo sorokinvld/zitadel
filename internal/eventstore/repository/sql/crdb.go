@@ -20,7 +20,7 @@ import (
 
 const (
 	//as soon as stored procedures are possible in crdb
-	// we could move the code to migrations and coll the procedure
+	// we could move the code to migrations and call the procedure
 	// traking issue: https://github.com/cockroachdb/cockroach/issues/17511
 	//
 	//previous_data selects the needed data of the latest event of the aggregate
@@ -67,7 +67,7 @@ const (
 		" $2::VARCHAR AS aggregate_type," +
 		" $3::VARCHAR AS aggregate_id," +
 		" $4::VARCHAR AS aggregate_version," +
-		" NOW() AS creation_date," +
+		" statement_timestamp() AS creation_date," +
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
@@ -99,10 +99,11 @@ const (
 
 type CRDB struct {
 	*database.DB
+	AllowOrderByCreationDate bool
 }
 
-func NewCRDB(client *database.DB) *CRDB {
-	return &CRDB{client}
+func NewCRDB(client *database.DB, allowOrderByCreationDate bool) *CRDB {
+	return &CRDB{client, allowOrderByCreationDate}
 }
 
 func (db *CRDB) Health(ctx context.Context) error { return db.Ping() }
@@ -139,7 +140,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 					"aggregateType", event.AggregateType,
 					"eventType", event.Type,
 					"instanceID", event.InstanceID,
-				).WithError(err).Info("query failed")
+				).WithError(err).Debug("query failed")
 				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
 		}
@@ -160,13 +161,18 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 var instanceRegexp = regexp.MustCompile(`eventstore\.i_[0-9a-zA-Z]{1,}_seq`)
 
 func (db *CRDB) CreateInstance(ctx context.Context, instanceID string) error {
-	row := db.QueryRowContext(ctx, "SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID)
-	if row.Err() != nil {
-		return caos_errs.ThrowInvalidArgument(row.Err(), "SQL-7gtFA", "Errors.InvalidArgument")
-	}
 	var sequenceName string
-	if err := row.Scan(&sequenceName); err != nil || !instanceRegexp.MatchString(sequenceName) {
-		return caos_errs.ThrowInvalidArgument(err, "SQL-7gtFA", "Errors.InvalidArgument")
+	err := db.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			if err := row.Scan(&sequenceName); err != nil || !instanceRegexp.MatchString(sequenceName) {
+				return caos_errs.ThrowInvalidArgument(err, "SQL-7gtFA", "Errors.InvalidArgument")
+			}
+			return nil
+		},
+		"SELECT CONCAT('eventstore.i_', $1::TEXT, '_seq')", instanceID,
+	)
+	if err != nil {
+		return err
 	}
 
 	if _, err := db.ExecContext(ctx, "CREATE SEQUENCE "+sequenceName); err != nil {
@@ -219,9 +225,9 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 }
 
 // Filter returns all events matching the given search query
-func (db *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error) {
+func (crdb *CRDB) Filter(ctx context.Context, searchQuery *repository.SearchQuery) (events []*repository.Event, err error) {
 	events = []*repository.Event{}
-	err = query(ctx, db, searchQuery, &events)
+	err = query(ctx, crdb, searchQuery, &events)
 	if err != nil {
 		return nil, err
 	}
@@ -249,11 +255,19 @@ func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *repository.SearchQ
 	return ids, nil
 }
 
-func (db *CRDB) db() *sql.DB {
-	return db.DB.DB
+func (db *CRDB) db() *database.DB {
+	return db.DB
 }
 
 func (db *CRDB) orderByEventSequence(desc bool) string {
+	if db.AllowOrderByCreationDate {
+		if desc {
+			return " ORDER BY creation_date DESC, event_sequence DESC"
+		}
+
+		return " ORDER BY creation_date, event_sequence"
+	}
+
 	if desc {
 		return " ORDER BY event_sequence DESC"
 	}

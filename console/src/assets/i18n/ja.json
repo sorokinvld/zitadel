@@ -44,6 +44,7 @@
   },
   "ONBOARDING": {
     "DESCRIPTION": "オンボーディングの手順",
+    "MOREDESCRIPTION": "より多くのショートカット",
     "COMPLETED": "完了",
     "DISMISS": "いいえ、私はプロです。",
     "CARD": {
@@ -53,27 +54,33 @@
     "EVENTS": {
       "instance.policy.label.added": {
         "title": "ブランドをセットアップする",
-        "description": "ログインの色と形状を定義し、ロゴとアイコンをアップロードします。"
+        "description": "ログインの色と形状を定義し、ロゴとアイコンをアップロードします。",
+        "action": "ブランディングの設定"
       },
       "instance.smtp.config.added": {
         "title": "SMTP設定をセットアップする",
-        "description": "独自のメールサーバーを設定します。"
+        "description": "独自のメールサーバーを設定します。",
+        "action": "SMTP 設定を設定する"
       },
       "project.added": {
         "title": "最初のプロジェクトを作成する",
-        "description": "最初のプロジェクトを追加し、ロールと認証を定義します。"
+        "description": "最初のプロジェクトを追加し、ロールと認証を定義します。",
+        "action": "プロジェクトを作成"
       },
       "project.application.added": {
         "title": "最初のアプリケーションを作成する",
-        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。"
+        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。",
+        "action": "アプリケーションを作成"
       },
       "user.human.added": {
         "title": "ユーザーを追加する",
-        "description": "アプリケーションユーザーを追加します。"
+        "description": "アプリケーションユーザーを追加します。",
+        "action": "ユーザーを作成"
       },
       "user.grant.added": {
         "title": "ユーザーにグラントする",
-        "description": "ユーザーがアプリケーションにアクセスし、ロールをセットアップできるようにします。"
+        "description": "ユーザーがアプリケーションにアクセスし、ロールをセットアップできるようにします。",
+        "action": "承認の作成"
       }
     }
   },
@@ -160,7 +167,14 @@
     "MORE": "さらに",
     "STEP": "ステップ",
     "SETUP": "セットアップ",
-    "COMINGSOON": "近日公開",
+    "UNSAVEDCHANGES": "未保存の変更",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "この新しいアクションを破棄してもよろしいですか?あなたのアクションは失われます",
+        "CANCEL": "キャンセル",
+        "DISCARD": "破棄"
+      }
+    },
     "TABLE": {
       "SHOWUSER": "ユーザー {{value}} を表示する"
     }
@@ -198,6 +212,9 @@
     },
     "CONTEXTCHANGED": {
       "TEXT": "注意！ 組織のコンテキストが変更されました。"
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "ビューがインスタンスに変更されました。"
     }
   },
   "FILTER": {
@@ -241,9 +258,14 @@
   },
   "ERRORS": {
     "REQUIRED": "一部の必須項目が不足しています。",
+    "ATLEASTONE": "少なくとも 1 つの値を指定してください。",
     "TOKENINVALID": {
       "TITLE": "トークンが期限切れになりました。",
       "DESCRIPTION": "下のボタンをクリックして、もう一度ログインする。"
+    },
+    "EXHAUSTED": {
+      "TITLE": "認証されたリクエストのクォータを使い果たしました",
+      "DESCRIPTION": "このZITADELインスタンスの制限を削除または増加させる"
     },
     "INVALID_FORMAT": "不正なフォーマットです",
     "NOTANEMAIL": "入力された値がメールアドレスではありません。",
@@ -390,7 +412,7 @@
       "DESCRIPTION": "二要素認証を追加して、アカウントに最適なセキュリティを確保します。",
       "MANAGE_DESCRIPTION": "ユーザーの二要素認証を管理する。",
       "ADD": "二要素認証を追加する",
-      "OTP": "OTP用認証アプリ（ワンタイム・パスワード）",
+      "OTP": "TOTP用認証アプリ（ワンタイム・パスワード）",
       "OTP_DIALOG_TITLE": "OTPの追加",
       "OTP_DIALOG_DESCRIPTION": "認証アプリでQRコードを読み取り、下記のコードを入力することで、OTP方式の確認と有効化ができます。",
       "U2F": "指紋、セキュリティキー、フェイスIDなど",
@@ -399,6 +421,12 @@
       "U2F_SUCCESS": "二要素認証が正常に追加されました！",
       "U2F_ERROR": "セットアップ中にエラーが発生しました！",
       "U2F_NAME": "認証者名",
+      "OTPSMS": "OTP（ワンタイムパスワード）とSMS",
+      "OTPEMAIL": "電子メールによる OTP (ワンタイム パスワード)",
+      "SETUPOTPSMSDESCRIPTION": "この電話番号を OTP (ワンタイム パスワード) の第 2 要素として設定しますか?",
+      "OTPSMSSUCCESS": "OTP 係数の設定が成功しました。",
+      "OTPSMSPHONEMUSTBEVERIFIED": "この方法を使用するには、電話を認証する必要があります。",
+      "OTPEMAILSUCCESS": "OTP 係数の設定が成功しました。",
       "TYPE": {
         "0": "MFAは定義されていません",
         "1": "ワンタイムパスワード（OTP）",
@@ -565,7 +593,8 @@
         "EDITVALUE": "電話番号",
         "EDITDESC": "下のフィールドに新しい電話番号を入力してください。",
         "DELETETITLE": "電話番号の削除",
-        "DELETEDESC": "本当に電話番号を削除してよろしいですか？"
+        "DELETEDESC": "本当に電話番号を削除してよろしいですか？",
+        "OTPSMSREMOVALWARNING": "このアカウントは、この電話番号を 2 番目の要素として使用します。続行すると使用できなくなります。"
       },
       "RESENDCODE": "再送信コード",
       "ENTERCODE": "認証",
@@ -1013,16 +1042,21 @@
     "LANGUAGE": {
       "de": "Deutsch",
       "en": "English",
+      "es": "Español",
       "fr": "Français",
       "it": "Italiano",
       "ja": "日本語",
       "pl": "Polski",
-      "zh": "简体中文"
+      "zh": "简体中文",
+      "bg": "Български",
+      "pt": "Portuguese",
+      "mk": "Македонски"
     },
     "SMTP": {
       "TITLE": "SMTP設定",
       "SENDERADDRESS": "送信者のメールアドレス",
       "SENDERNAME": "送信者名",
+      "REPLYTOADDRESS": "返信先アドレス",
       "HOSTANDPORT": "ホストとポート",
       "USER": "ユーザー",
       "PASSWORD": "パスワード",
@@ -1076,7 +1110,9 @@
         "3": "電話番号認証",
         "4": "パスワードのリセット",
         "5": "パスワードレスの初期設定",
-        "6": "アプリのシークレット"
+        "6": "アプリのシークレット",
+        "7": "ワンタイムパスワード (OTP) - SMS",
+        "8": "ワンタイムパスワード (OTP) - 電子メール"
       },
       "ADDGENERATOR": "シークレットの設定を定義する",
       "GENERATORTYPE": "タイプ",
@@ -1206,11 +1242,15 @@
       "LOCALES": {
         "de": "Deutsch",
         "en": "English",
+        "es": "Español",
         "fr": "Français",
         "it": "Italiano",
         "ja": "日本語",
         "pl": "Polski",
-        "zh": "简体中文"
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1257,6 +1297,8 @@
         "INIT": "初期セットアップ",
         "VE": "メールの認証",
         "VP": "電話番号の認証",
+        "VSO": "SMS OTPを確認する",
+        "VEO": "メールOTPを確認する",
         "PR": "パスワードのリセット",
         "DC": "ドメインクレーム",
         "PL": "パスワードレス",
@@ -1277,7 +1319,9 @@
         "verifiedPhone": "認証済みの電話番号",
         "changedate": "変更日",
         "username": "ユーザー名",
-        "tempUsername": "一時ユーザー名"
+        "tempUsername": "一時ユーザー名",
+        "otp": "ワンタイムパスワード",
+        "verifyUrl": "ワンタイムパスワードを確認するURL"
       },
       "TOAST": {
         "UPDATED": "カスタムテキストが保存されました。"
@@ -1309,6 +1353,8 @@
       "ALLOWREGISTER_DESC": "このオプションが選択されている場合、ユーザーを登録するための追加のステップがログインに表示されます。",
       "FORCEMFA": "MFAを強制する",
       "FORCEMFA_DESC": "このオプションが選択されている場合、ユーザーはログイン用の二要素認証を構成する必要があります。",
+      "FORCEMFALOCALONLY": "ローカル ユーザーに MFA を強制する",
+      "FORCEMFALOCALONLY_DESC": "オプションが選択されている場合、ローカル認証されたユーザーはログインの 2 番目の要素を構成する必要があります。",
       "HIDEPASSWORDRESET": "パスワードリセットを非表示にする",
       "HIDEPASSWORDRESET_DESC": "このオプションが選択されている場合、ユーザーはログイン過程ででパスワードをリセットできません。",
       "HIDELOGINNAMESUFFIX": "ログイン名の接尾辞を非表示にする",
@@ -1476,13 +1522,11 @@
         "SEL_PROJECT": "プロジェクトを検索する",
         "SEL_ROLES": "許可するロールを選択する",
         "SEL_USER": "ユーザーを選択する",
-        "SEL_ORG": "ドメインを設定する",
-        "SEL_ORG_DESC": "完全なドメインを入力して、アクセスを許可する組織を指定する。",
-        "ORG_TITLE": "組織",
+        "SEL_ORG": "組織を検索する",
+        "SEL_ORG_DESC": "付与する組織を検索する",
         "ORG_DESCRIPTION": "組織 {{name}} にユーザーをグラントします。",
         "ORG_DESCRIPTION_DESC": "上記のヘッダーのコンテキストを切り替えることで、別組織のユーザーにグラントできます。",
-        "SEL_ORG_FORMFIELD": "完全なドメイン",
-        "SEL_ORG_BUTTON": "組織を検索する",
+        "SEL_ORG_FORMFIELD": "組織",
         "FOR_ORG": "グラントが以下に対して作成されます："
       },
       "DETAIL": {
@@ -1685,9 +1729,10 @@
       "2": "非アクティブ"
     },
     "AZUREADTENANTTYPES": {
-      "0": "共通",
-      "1": "組織",
-      "2": "顧客"
+      "3": "Tenant ID",
+      "0": "Common",
+      "1": "Organizations",
+      "2": "Consumers"
     },
     "AZUREADTENANTTYPE": "テナントタイプ",
     "AZUREADTENANTID": "テナントID",
@@ -1752,6 +1797,8 @@
     "DELETE": "削除",
     "DELETE_TITLE": "IDPの削除",
     "DELETE_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
+    "REMOVE_WARN_TITLE": "IDPを削除する",
+    "REMOVE_WARN_DESCRIPTION": "ID プロバイダーを削除しようとしています。これにより、ユーザーが使用できる IDP の選択が削除され、すでに登録されているユーザーは再度ログインできなくなります。続けてもよろしいですか?",
     "DELETE_SELECTION_TITLE": "IDPの削除",
     "DELETE_SELECTION_DESCRIPTION": "IDプロバイダーを削除しようとしています。変更は取消できません。本当によろしいですか？",
     "EMPTY": "IDPは利用できません",
@@ -1777,7 +1824,9 @@
       "DELETED": "IDPは正常に削除されました！",
       "ADDED": "正常に追加されました。",
       "REMOVED": "正常に削除されました。"
-    }
+    },
+    "ISIDTOKENMAPPING": "IDトークンからのマッピング",
+    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。"
   },
   "MFA": {
     "LIST": {
@@ -1806,8 +1855,10 @@
     },
     "SECONDFACTORTYPES": {
       "0": "不明",
-      "1": "ワンタイムパスワード（OTP）",
-      "2": "指紋、セキュリティキー、フェイスIDなど"
+      "1": "認証アプリ用ワンタイムパスワード(TOTP)",
+      "2": "指紋、セキュリティキー、フェイスIDなど",
+      "3": "Eメール用ワンタイムパスワード（email OTP）",
+      "4": "SMS用ワンタイムパスワード（SMS OTP）"
     }
   },
   "LOGINPOLICY": {
@@ -1922,6 +1973,8 @@
       "REGENERATESECRET": "クライアントシークレットを再生成する",
       "DEVMODE": "開発モード",
       "DEVMODEDESC": "注意：開発モードを有効にすると、URIが認証されません。",
+      "SKIPNATIVEAPPSUCCESSPAGE": "ログイン後に成功ページをスキップする",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "このネイティブアプリのログイン後に成功ページをスキップする",
       "REDIRECT": "リダイレクトURI",
       "REDIRECTSECTION": "リダイレクトURI",
       "POSTLOGOUTREDIRECT": "ログアウトURI",
@@ -1944,7 +1997,8 @@
       "GRANT": {
         "0": "Authorization Code",
         "1": "Implicit",
-        "2": "Refresh Token"
+        "2": "Refresh Token",
+        "3": "Device Code"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2035,6 +2089,10 @@
         "TITLE": "Implicit",
         "DESCRIPTION": "認証エンドポイントから直接トークンを取得します。"
       },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "コンピューターまたはスマートフォンでデバイスを認証します。"
+      },
       "CUSTOM": {
         "TITLE": "Custom",
         "DESCRIPTION": "設定は他のオプションに対応していません。"
@@ -2061,11 +2119,15 @@
   "LANGUAGES": {
     "de": "Deutsch",
     "en": "English",
+    "es": "Español",
     "fr": "Français",
     "it": "Italiano",
     "ja": "日本語",
     "pl": "Polski",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

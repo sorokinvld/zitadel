@@ -60,7 +60,7 @@ InitPassword:
   CodeLabel: Code
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirmLabel: Confirmer le mot de passe
-  ResendButtonText: code de réexpédition
+  ResendButtonText: renvoyer le code
   NextButtonText: suivant
 
 InitPasswordDone:
@@ -76,7 +76,7 @@ InitUser:
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirm: Confirmer le mot de passe
   NextButtonText: Suivant
-  ResendButtonText: code de réexpédition
+  ResendButtonText: renvoyer le code
 
 InitUserDone:
   Title: User Utilisateur activé
@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: L'authentification à deux facteurs vous offre une sécurité supplémentaire pour votre compte d'utilisateur. Vous êtes ainsi assuré d'être le seul à avoir accès à votre compte.
   Provider0: Application d'authentification (par exemple, Google/Microsoft Authenticator, Authy)
   Provider1: Dépend de l'appareil (par ex. FaceID, Windows Hello, empreinte digitale)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   NextButtonText: Suivant
   SkipButtonText: Passer
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Code
   NextButtonText: Suivant
   CancelButtonText: Annuler
+
+InitMFASMS:
+  Title: Vérification à deux facteurs
+  DescriptionPhone: Créez votre 2-facteurs. Entrez votre numéro de téléphone pour le vérifier.
+  DescriptionCode: Créez votre 2-facteurs. Entrez le code reçu pour vérifier votre numéro de téléphone.
+  PhoneLabel: Numéro de téléphone
+  CodeLabel: Code
+  EditButtonText: Modifier
+  ResendButtonText: Renvoyer le code
+  NextButtonText: Suivant
 
 InitMFAU2F:
   Title: Ajouter une clé de sécurité
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: Application d'authentification (par exemple, Google/Microsoft Authenticator, Authy)
   Provider1: Dépend de l'appareil (par ex. FaceID, Windows Hello, empreinte digitale)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   ChooseOther: ou choisissez une autre option
 
 VerifyMFAOTP:
   Title: Vérifier 2-Facteurs
   Description: Vérifiez votre second facteur
   CodeLabel: Code
+  NextButtonText: Suivant
+
+VerifyOTP:
+  Title: Vérifier 2-Facteurs
+  Description: Vérifiez votre second facteur
+  CodeLabel: Code
+  ResendButtonText: Renvoyer le code
   NextButtonText: Suivant
 
 VerifyMFAU2F:
@@ -189,7 +210,7 @@ EmailVerification:
   Description: Nous vous avons envoyé un e-mail pour vérifier votre adresse. Veuillez saisir le code dans le formulaire ci-dessous.
   CodeLabel: Code
   NextButtonText: suivant
-  ResendButtonText: code de réexpédition
+  ResendButtonText: renvoyer le code
 
 EmailVerificationDone:
   Title: E-Mail Verification
@@ -221,6 +242,10 @@ RegistrationUser:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Genre
   Female: Femme
   Male: Homme
@@ -253,6 +278,10 @@ ExternalRegistrationUserOverview:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -313,6 +342,28 @@ ExternalNotFound:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+
+DeviceAuth:
+  Title: Autorisation de l'appareil
+  UserCode:
+    Label: Code d'utilisateur
+    Description: Saisissez le code utilisateur présenté sur l'appareil.
+    ButtonNext: suivant
+  Action:
+    Description: Accordez l'accès à l'appareil.
+    GrantDevice: vous êtes sur le point d'accorder un appareil
+    AccessToScopes: accès aux périmètres suivants
+    Button:
+      Allow: permettre
+      Deny: refuser
+  Done:
+    Description: Fait.
+    Approved: Autorisation de l'appareil approuvée. Vous pouvez maintenant retourner à l'appareil.
+    Denied: Autorisation de l'appareil refusée. Vous pouvez maintenant retourner à l'appareil.
 
 Footer:
   PoweredBy: Promulgué par
@@ -373,6 +424,7 @@ Errors:
       Empty: Le mot de passe est vide
       Invalid: Le mot de passe n'est pas valide
       InvalidAndLocked: Le mot de passe n'est pas valide et l'utilisateur est verrouillé, contactez votre administrateur.
+      NotChanged: Mot de passe non modifié
     UsernameOrPassword:
       Invalid: Le nom d'utilisateur ou le mot de passe n'est pas valide
     PasswordComplexityPolicy:
@@ -422,5 +474,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: L'enregistrement n'est pas autorisé
+  DeviceAuth:
+    NotExisting: Le code utilisateur n'existe pas
 
 optional: (facultatif)

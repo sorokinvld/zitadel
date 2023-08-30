@@ -25,7 +25,8 @@ import (
 )
 
 const (
-	tmplError = "error"
+	tmplError   = "error"
+	tmplSuccess = "success"
 )
 
 type Renderer struct {
@@ -45,6 +46,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 	}
 	tmplMapping := map[string]string{
 		tmplError:                        "error.html",
+		tmplSuccess:                      "success.html",
 		tmplLogin:                        "login.html",
 		tmplUserSelection:                "select_user.html",
 		tmplPassword:                     "password.html",
@@ -52,9 +54,11 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplPasswordlessRegistration:     "passwordless_registration.html",
 		tmplPasswordlessRegistrationDone: "passwordless_registration_done.html",
 		tmplPasswordlessPrompt:           "passwordless_prompt.html",
-		tmplMFAVerify:                    "mfa_verify_otp.html",
+		tmplMFAVerify:                    "mfa_verify_totp.html",
 		tmplMFAPrompt:                    "mfa_prompt.html",
 		tmplMFAInitVerify:                "mfa_init_otp.html",
+		tmplMFASMSInit:                   "mfa_init_otp_sms.html",
+		tmplOTPVerification:              "mfa_verify_otp.html",
 		tmplMFAU2FInit:                   "mfa_init_u2f.html",
 		tmplU2FVerification:              "mfa_verification_u2f.html",
 		tmplMFAInitDone:                  "mfa_init_done.html",
@@ -77,6 +81,8 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplExternalNotFoundOption:       "external_not_found_option.html",
 		tmplLoginSuccess:                 "login_success.html",
 		tmplLDAPLogin:                    "ldap_login.html",
+		tmplDeviceAuthUserCode:           "device_usercode.html",
+		tmplDeviceAuthAction:             "device_action.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -161,10 +167,16 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return path.Join(r.pathPrefix, EndpointMFAPrompt)
 		},
 		"mfaPromptChangeUrl": func(id string, provider domain.MFAType) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMFAPrompt, QueryAuthRequestID, id, "provider", provider))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%v", EndpointMFAPrompt, QueryAuthRequestID, id, "provider", provider))
 		},
 		"mfaInitVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMFAInitVerify)
+		},
+		"mfaInitSMSVerifyUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointMFASMSInitVerify)
+		},
+		"mfaOTPVerifyUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointMFAOTPVerify)
 		},
 		"mfaInitU2FVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMFAInitU2FVerify)
@@ -323,6 +335,12 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var msg string
 	if err != nil {
+		log := logging.WithError(err)
+		if authReq != nil {
+			log = log.WithField("auth_req_id", authReq.ID)
+		}
+		log.Error()
+
 		_, msg = l.getErrorMessage(r, err)
 	}
 	data := l.getBaseData(r, authReq, "Errors.Internal", "", "Internal", msg)
@@ -663,7 +681,7 @@ type mfaVerifyData struct {
 	baseData
 	profileData
 	MFAType domain.MFAType
-	otpData
+	totpData
 }
 
 type mfaDoneData struct {
@@ -672,7 +690,7 @@ type mfaDoneData struct {
 	MFAType domain.MFAType
 }
 
-type otpData struct {
+type totpData struct {
 	Url    string
 	Secret string
 	QrCode string

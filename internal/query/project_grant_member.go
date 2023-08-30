@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -94,7 +95,7 @@ func addProjectGrantMemberWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[ProjectGrantMemberGrantedOrgRemoved.identifier()] = false
 }
 
-func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrantMembersQuery, withOwnerRemoved bool) (*Members, error) {
+func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrantMembersQuery, withOwnerRemoved bool) (members *Members, err error) {
 	query, scan := prepareProjectGrantMembersQuery(ctx, q.client)
 	eq := sq.Eq{ProjectGrantMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
@@ -111,14 +112,14 @@ func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrant
 		return nil, err
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		members, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Pdg1I", "Errors.Internal")
 	}
-	members, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
+
 	members.LatestSequence = currentSequence
 	return members, err
 }
@@ -138,10 +139,12 @@ func prepareProjectGrantMembersQuery(ctx context.Context, db prepareDatabase) (s
 			HumanDisplayNameCol.identifier(),
 			MachineNameCol.identifier(),
 			HumanAvatarURLCol.identifier(),
+			UserTypeCol.identifier(),
 			countColumn.identifier(),
 		).From(projectGrantMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, ProjectGrantMemberUserID)).
+			LeftJoin(join(UserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(LoginNameUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(ProjectGrantColumnGrantID, ProjectGrantMemberGrantID) + db.Timetravel(call.Took(ctx))).
 			Where(
@@ -162,6 +165,7 @@ func prepareProjectGrantMembersQuery(ctx context.Context, db prepareDatabase) (s
 					displayName        = sql.NullString{}
 					machineName        = sql.NullString{}
 					avatarURL          = sql.NullString{}
+					userType           = sql.NullInt32{}
 				)
 
 				err := rows.Scan(
@@ -178,6 +182,7 @@ func prepareProjectGrantMembersQuery(ctx context.Context, db prepareDatabase) (s
 					&displayName,
 					&machineName,
 					&avatarURL,
+					&userType,
 
 					&count,
 				)
@@ -196,6 +201,7 @@ func prepareProjectGrantMembersQuery(ctx context.Context, db prepareDatabase) (s
 				} else {
 					member.DisplayName = machineName.String
 				}
+				member.UserType = domain.UserType(userType.Int32)
 
 				members = append(members, member)
 			}

@@ -8,7 +8,6 @@ import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/lega
 import { MatLegacyMenuModule as MatMenuModule } from '@angular/material/legacy-menu';
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { MatLegacyTableModule as MatTableModule } from '@angular/material/legacy-table';
-import { MatLegacyTabsModule as MatTabsModule } from '@angular/material/legacy-tabs';
 import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -39,6 +38,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 
 import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
 import { QRCodeModule } from 'angularx-qrcode';
+import { InfoDialogModule } from 'src/app/modules/info-dialog/info-dialog.module';
 import { MetadataModule } from 'src/app/modules/metadata/metadata.module';
 import { CountryCallingCodesService } from 'src/app/services/country-calling-codes.service';
 import { InfoRowModule } from '../../../modules/info-row/info-row.module';
@@ -87,7 +87,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     ChangesModule,
     CommonModule,
     SidenavModule,
-    MatTabsModule,
+    InfoDialogModule,
     FormsModule,
     ReactiveFormsModule,
     MembershipsTableModule,

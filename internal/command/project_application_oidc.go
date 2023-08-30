@@ -19,20 +19,21 @@ import (
 
 type addOIDCApp struct {
 	AddApp
-	Version                  domain.OIDCVersion
-	RedirectUris             []string
-	ResponseTypes            []domain.OIDCResponseType
-	GrantTypes               []domain.OIDCGrantType
-	ApplicationType          domain.OIDCApplicationType
-	AuthMethodType           domain.OIDCAuthMethodType
-	PostLogoutRedirectUris   []string
-	DevMode                  bool
-	AccessTokenType          domain.OIDCTokenType
-	AccessTokenRoleAssertion bool
-	IDTokenRoleAssertion     bool
-	IDTokenUserinfoAssertion bool
-	ClockSkew                time.Duration
-	AdditionalOrigins        []string
+	Version                     domain.OIDCVersion
+	RedirectUris                []string
+	ResponseTypes               []domain.OIDCResponseType
+	GrantTypes                  []domain.OIDCGrantType
+	ApplicationType             domain.OIDCApplicationType
+	AuthMethodType              domain.OIDCAuthMethodType
+	PostLogoutRedirectUris      []string
+	DevMode                     bool
+	AccessTokenType             domain.OIDCTokenType
+	AccessTokenRoleAssertion    bool
+	IDTokenRoleAssertion        bool
+	IDTokenUserinfoAssertion    bool
+	ClockSkew                   time.Duration
+	AdditionalOrigins           []string
+	SkipSuccessPageForNativeApp bool
 
 	ClientID          string
 	ClientSecret      *crypto.CryptoValue
@@ -76,10 +77,11 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.Has
 			}
 
 			if app.AuthMethodType == domain.OIDCAuthMethodTypeBasic || app.AuthMethodType == domain.OIDCAuthMethodTypePost {
-				app.ClientSecret, app.ClientSecretPlain, err = newAppClientSecret(ctx, filter, clientSecretAlg)
+				code, err := c.newAppClientSecret(ctx, filter, clientSecretAlg)
 				if err != nil {
 					return nil, err
 				}
+				app.ClientSecret, app.ClientSecretPlain = code.Crypted, code.Plain
 			}
 
 			return []eventstore.Command{
@@ -109,6 +111,7 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.Has
 					app.IDTokenUserinfoAssertion,
 					app.ClockSkew,
 					app.AdditionalOrigins,
+					app.SkipSuccessPageForNativeApp,
 				),
 			}, nil
 		}, nil
@@ -191,7 +194,9 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		oidcApp.IDTokenRoleAssertion,
 		oidcApp.IDTokenUserinfoAssertion,
 		oidcApp.ClockSkew,
-		oidcApp.AdditionalOrigins))
+		oidcApp.AdditionalOrigins,
+		oidcApp.SkipNativeAppSuccessPage,
+	))
 
 	addedApplication.AppID = oidcApp.AppID
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
@@ -241,7 +246,9 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.IDTokenRoleAssertion,
 		oidc.IDTokenUserinfoAssertion,
 		oidc.ClockSkew,
-		oidc.AdditionalOrigins)
+		oidc.AdditionalOrigins,
+		oidc.SkipNativeAppSuccessPage,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -319,7 +326,7 @@ func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID,
 
 	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.userPasswordAlg)
+	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.codeAlg)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
 		_, err = c.eventstore.Push(ctx, project_repo.NewOIDCConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))

@@ -13,6 +13,9 @@ import (
 
 const (
 	sslDisabledMode = "disable"
+	sslRequireMode  = "require"
+	sslAllowMode    = "allow"
+	sslPreferMode   = "prefer"
 )
 
 type Config struct {
@@ -115,6 +118,11 @@ func (s *Config) checkSSL(user User) {
 		user.SSL = SSL{Mode: sslDisabledMode}
 		return
 	}
+
+	if user.SSL.Mode == sslRequireMode || user.SSL.Mode == sslAllowMode || user.SSL.Mode == sslPreferMode {
+		return
+	}
+
 	if user.SSL.RootCert == "" {
 		logging.WithFields(
 			"cert set", user.SSL.Cert != "",
@@ -149,7 +157,9 @@ func (c Config) String(useAdmin bool) string {
 		fields = append(fields, "dbname=postgres")
 	}
 	if user.SSL.Mode != sslDisabledMode {
-		fields = append(fields, "sslrootcert="+user.SSL.RootCert)
+		if user.SSL.RootCert != "" {
+			fields = append(fields, "sslrootcert="+user.SSL.RootCert)
+		}
 		if user.SSL.Cert != "" {
 			fields = append(fields, "sslcert="+user.SSL.Cert)
 		}

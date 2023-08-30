@@ -22,6 +22,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
+import { supportedLanguages } from 'src/app/utils/language';
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 import { MachineSecretDialogComponent } from './machine-secret-dialog/machine-secret-dialog.component';
@@ -44,7 +45,7 @@ export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
   public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en', 'it', 'fr', 'ja', 'pl', 'zh'];
+  public languages: string[] = supportedLanguages;
 
   public ChangeType: any = ChangeType;
 
@@ -507,7 +508,7 @@ export class UserDetailComponent implements OnInit {
         this.metadata = resp.resultList.map((md) => {
           return {
             key: md.key,
-            value: Buffer.from(md.value as string, 'base64').toString('ascii'),
+            value: Buffer.from(md.value as string, 'base64').toString('utf-8'),
           };
         });
       })

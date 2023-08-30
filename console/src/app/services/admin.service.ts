@@ -66,8 +66,12 @@ import {
   GetCustomPasswordResetMessageTextResponse,
   GetCustomVerifyEmailMessageTextRequest,
   GetCustomVerifyEmailMessageTextResponse,
+  GetCustomVerifyEmailOTPMessageTextRequest,
+  GetCustomVerifyEmailOTPMessageTextResponse,
   GetCustomVerifyPhoneMessageTextRequest,
   GetCustomVerifyPhoneMessageTextResponse,
+  GetCustomVerifySMSOTPMessageTextRequest,
+  GetCustomVerifySMSOTPMessageTextResponse,
   GetDefaultDomainClaimedMessageTextRequest,
   GetDefaultDomainClaimedMessageTextResponse,
   GetDefaultInitMessageTextRequest,
@@ -84,8 +88,12 @@ import {
   GetDefaultPasswordResetMessageTextResponse,
   GetDefaultVerifyEmailMessageTextRequest,
   GetDefaultVerifyEmailMessageTextResponse,
+  GetDefaultVerifyEmailOTPMessageTextRequest,
+  GetDefaultVerifyEmailOTPMessageTextResponse,
   GetDefaultVerifyPhoneMessageTextRequest,
   GetDefaultVerifyPhoneMessageTextResponse,
+  GetDefaultVerifySMSOTPMessageTextRequest,
+  GetDefaultVerifySMSOTPMessageTextResponse,
   GetDomainPolicyRequest,
   GetDomainPolicyResponse,
   GetFileSystemNotificationProviderRequest,
@@ -196,8 +204,12 @@ import {
   SetDefaultPasswordResetMessageTextResponse,
   SetDefaultVerifyEmailMessageTextRequest,
   SetDefaultVerifyEmailMessageTextResponse,
+  SetDefaultVerifyEmailOTPMessageTextRequest,
+  SetDefaultVerifyEmailOTPMessageTextResponse,
   SetDefaultVerifyPhoneMessageTextRequest,
   SetDefaultVerifyPhoneMessageTextResponse,
+  SetDefaultVerifySMSOTPMessageTextRequest,
+  SetDefaultVerifySMSOTPMessageTextResponse,
   SetSecurityPolicyRequest,
   SetSecurityPolicyResponse,
   SetUpOrgRequest,
@@ -256,6 +268,26 @@ import {
   UpdateSMTPConfigResponse,
 } from '../proto/generated/zitadel/admin_pb';
 import { Event } from '../proto/generated/zitadel/event_pb';
+import {
+  ResetCustomDomainClaimedMessageTextToDefaultRequest,
+  ResetCustomDomainClaimedMessageTextToDefaultResponse,
+  ResetCustomInitMessageTextToDefaultRequest,
+  ResetCustomInitMessageTextToDefaultResponse,
+  ResetCustomPasswordChangeMessageTextToDefaultRequest,
+  ResetCustomPasswordChangeMessageTextToDefaultResponse,
+  ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest,
+  ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse,
+  ResetCustomPasswordResetMessageTextToDefaultRequest,
+  ResetCustomPasswordResetMessageTextToDefaultResponse,
+  ResetCustomVerifyEmailMessageTextToDefaultRequest,
+  ResetCustomVerifyEmailMessageTextToDefaultResponse,
+  ResetCustomVerifyEmailOTPMessageTextToDefaultRequest,
+  ResetCustomVerifyEmailOTPMessageTextToDefaultResponse,
+  ResetCustomVerifyPhoneMessageTextToDefaultRequest,
+  ResetCustomVerifyPhoneMessageTextToDefaultResponse,
+  ResetCustomVerifySMSOTPMessageTextToDefaultRequest,
+  ResetCustomVerifySMSOTPMessageTextToDefaultResponse,
+} from '../proto/generated/zitadel/management_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
@@ -267,9 +299,20 @@ export interface OnboardingActions {
   oneof: string[];
   link: string | string[];
   fragment?: string | undefined;
+  iconClasses?: string;
+  darkcolor: string;
+  lightcolor: string;
 }
 
-type OnboardingEvent = { order: number; link: string; fragment: string | undefined; event: Event.AsObject | undefined };
+type OnboardingEvent = {
+  order: number;
+  link: string;
+  fragment: string | undefined;
+  event: Event.AsObject | undefined;
+  iconClasses?: string;
+  darkcolor: string;
+  lightcolor: string;
+};
 type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
 
 @Injectable({
@@ -286,14 +329,30 @@ export class AdminService {
       const eventsReq = new ListEventsRequest().setAsc(true).setEventTypesList(searchForTypes).setAsc(false);
       return from(this.listEvents(eventsReq)).pipe(
         map((events) => {
-          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API');
+          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API' && e.editor?.userId);
 
           let obj: { [type: string]: OnboardingEvent } = {};
           actions.map((action) => {
             const filtered = el.filter((event) => event.type?.type && action.oneof.includes(event.type.type));
             (obj as any)[action.eventType] = filtered.length
-              ? { order: action.order, link: action.link, fragment: action.fragment, event: filtered[0] }
-              : { order: action.order, link: action.link, fragment: action.fragment, event: undefined };
+              ? {
+                  order: action.order,
+                  link: action.link,
+                  fragment: action.fragment,
+                  event: filtered[0],
+                  iconClasses: action.iconClasses,
+                  darkcolor: action.darkcolor,
+                  lightcolor: action.lightcolor,
+                }
+              : {
+                  order: action.order,
+                  link: action.link,
+                  fragment: action.fragment,
+                  event: undefined,
+                  iconClasses: action.iconClasses,
+                  darkcolor: action.darkcolor,
+                  lightcolor: action.lightcolor,
+                };
           });
 
           const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);
@@ -388,6 +447,12 @@ export class AdminService {
     return this.grpcService.admin.getCustomInitMessageText(req, null).then((resp) => resp.toObject());
   }
 
+  public resetCustomInitMessageTextToDefault(lang: string): Promise<ResetCustomInitMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomInitMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomInitMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
   public setDefaultInitMessageText(
     req: SetDefaultInitMessageTextRequest,
   ): Promise<SetDefaultInitMessageTextResponse.AsObject> {
@@ -412,6 +477,14 @@ export class AdminService {
     return this.grpcService.admin.setDefaultVerifyEmailMessageText(req, null).then((resp) => resp.toObject());
   }
 
+  public resetCustomVerifyEmailMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomVerifyEmailMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomVerifyEmailMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomVerifyEmailMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
   public getDefaultVerifyPhoneMessageText(
     req: GetDefaultVerifyPhoneMessageTextRequest,
   ): Promise<GetDefaultVerifyPhoneMessageTextResponse.AsObject> {
@@ -428,6 +501,66 @@ export class AdminService {
     req: SetDefaultVerifyPhoneMessageTextRequest,
   ): Promise<SetDefaultVerifyPhoneMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultVerifyPhoneMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomVerifyPhoneMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomVerifyPhoneMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomVerifyPhoneMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomVerifyPhoneMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
+  public getDefaultVerifySMSOTPMessageText(
+    req: GetDefaultVerifySMSOTPMessageTextRequest,
+  ): Promise<GetDefaultVerifySMSOTPMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultVerifySMSOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomVerifySMSOTPMessageText(
+    req: GetCustomVerifySMSOTPMessageTextRequest,
+  ): Promise<GetCustomVerifySMSOTPMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getCustomVerifySMSOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setDefaultVerifySMSOTPMessageText(
+    req: SetDefaultVerifySMSOTPMessageTextRequest,
+  ): Promise<SetDefaultVerifySMSOTPMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultVerifySMSOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomVerifySMSOTPMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomVerifySMSOTPMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomVerifySMSOTPMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomVerifySMSOTPMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
+  public getDefaultVerifyEmailOTPMessageText(
+    req: GetDefaultVerifyEmailOTPMessageTextRequest,
+  ): Promise<GetDefaultVerifyEmailOTPMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultVerifyEmailOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomVerifyEmailOTPMessageText(
+    req: GetCustomVerifyEmailOTPMessageTextRequest,
+  ): Promise<GetCustomVerifyEmailOTPMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getCustomVerifyEmailOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setDefaultVerifyEmailOTPMessageText(
+    req: SetDefaultVerifyEmailOTPMessageTextRequest,
+  ): Promise<SetDefaultVerifyEmailOTPMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultVerifyEmailOTPMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomVerifyEmailOTPMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomVerifyEmailOTPMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomVerifyEmailOTPMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomVerifyEmailOTPMessageTextToDefault(req, null).then((resp) => resp.toObject());
   }
 
   public getDefaultPasswordResetMessageText(
@@ -448,6 +581,14 @@ export class AdminService {
     return this.grpcService.admin.setDefaultPasswordResetMessageText(req, null).then((resp) => resp.toObject());
   }
 
+  public resetCustomPasswordResetMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomPasswordResetMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomPasswordResetMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomPasswordResetMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
   public getDefaultDomainClaimedMessageText(
     req: GetDefaultDomainClaimedMessageTextRequest,
   ): Promise<GetDefaultDomainClaimedMessageTextResponse.AsObject> {
@@ -464,6 +605,14 @@ export class AdminService {
     req: SetDefaultDomainClaimedMessageTextRequest,
   ): Promise<SetDefaultDomainClaimedMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultDomainClaimedMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomDomainClaimedMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomDomainClaimedMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomDomainClaimedMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomDomainClaimedMessageTextToDefault(req, null).then((resp) => resp.toObject());
   }
 
   public getDefaultPasswordlessRegistrationMessageText(
@@ -484,6 +633,16 @@ export class AdminService {
     return this.grpcService.admin.setDefaultPasswordlessRegistrationMessageText(req, null).then((resp) => resp.toObject());
   }
 
+  public resetCustomPasswordlessRegistrationMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin
+      .resetCustomPasswordlessRegistrationMessageTextToDefault(req, null)
+      .then((resp) => resp.toObject());
+  }
+
   public getDefaultPasswordChangeMessageText(
     req: GetDefaultPasswordChangeMessageTextRequest,
   ): Promise<GetDefaultPasswordChangeMessageTextResponse.AsObject> {
@@ -500,6 +659,14 @@ export class AdminService {
     req: SetDefaultPasswordChangeMessageTextRequest,
   ): Promise<SetDefaultPasswordChangeMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultPasswordChangeMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomPasswordChangeMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomPasswordChangeMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomPasswordChangeMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.admin.resetCustomPasswordChangeMessageTextToDefault(req, null).then((resp) => resp.toObject());
   }
 
   public SetUpOrg(org: SetUpOrgRequest.Org, human: SetUpOrgRequest.Human): Promise<SetUpOrgResponse.AsObject> {
@@ -1018,6 +1185,10 @@ export class AdminService {
 
   public getProviderByID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse.AsObject> {
     return this.grpcService.admin.getProviderByID(req, null).then((resp) => resp.toObject());
+  }
+
+  public getProviderID(req: GetProviderByIDRequest): Promise<GetProviderByIDResponse> {
+    return this.grpcService.admin.getProviderByID(req, null);
   }
 
   public listIAMMembers(

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -9,18 +10,13 @@ import (
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
-type HumanDetails struct {
-	ID string
-	ObjectDetails
-}
-
 type Human struct {
 	es_models.ObjectRoot
 
 	Username string
 	State    UserState
 	*Password
-	*HashedPassword
+	HashedPassword string
 	*Profile
 	*Email
 	*Phone
@@ -89,16 +85,28 @@ func (u *Human) CheckDomainPolicy(policy *DomainPolicy) error {
 	return nil
 }
 
-func (u *Human) SetNamesAsDisplayname() {
-	if u.Profile != nil && u.DisplayName == "" && u.FirstName != "" && u.LastName != "" {
-		u.DisplayName = u.FirstName + " " + u.LastName
+func (u *Human) EnsureDisplayName() {
+	if u.Profile == nil {
+		u.Profile = new(Profile)
 	}
+	if u.DisplayName != "" {
+		return
+	}
+	if u.FirstName != "" && u.LastName != "" {
+		u.DisplayName = u.FirstName + " " + u.LastName
+		return
+	}
+	if u.Email != nil && strings.TrimSpace(string(u.Email.EmailAddress)) != "" {
+		u.DisplayName = string(u.Email.EmailAddress)
+		return
+	}
+	u.DisplayName = u.Username
 }
 
-func (u *Human) HashPasswordIfExisting(policy *PasswordComplexityPolicy, passwordAlg crypto.HashAlgorithm, onetime bool) error {
+func (u *Human) HashPasswordIfExisting(policy *PasswordComplexityPolicy, hasher *crypto.PasswordHasher, onetime bool) error {
 	if u.Password != nil {
 		u.Password.ChangeRequired = onetime
-		return u.Password.HashPasswordIfExisting(policy, passwordAlg)
+		return u.Password.HashPasswordIfExisting(policy, hasher)
 	}
 	return nil
 }
@@ -107,7 +115,7 @@ func (u *Human) IsInitialState(passwordless, externalIDPs bool) bool {
 	if externalIDPs {
 		return false
 	}
-	return u.Email == nil || !u.IsEmailVerified || !passwordless && (u.Password == nil || u.Password.SecretString == "") && (u.HashedPassword == nil || u.HashedPassword.SecretString == "")
+	return u.Email == nil || !u.IsEmailVerified || !passwordless && (u.Password == nil || u.Password.SecretString == "") && u.HashedPassword == ""
 }
 
 func NewInitUserCode(generator crypto.Generator) (*InitUserCode, error) {

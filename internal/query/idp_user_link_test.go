@@ -14,14 +14,14 @@ import (
 var (
 	idpUserLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_user_links3.idp_id,` +
 		` projections.idp_user_links3.user_id,` +
-		` projections.idp_templates4.name,` +
+		` projections.idp_templates5.name,` +
 		` projections.idp_user_links3.external_user_id,` +
 		` projections.idp_user_links3.display_name,` +
-		` projections.idp_templates4.type,` +
+		` projections.idp_templates5.type,` +
 		` projections.idp_user_links3.resource_owner,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.idp_user_links3` +
-		` LEFT JOIN projections.idp_templates4 ON projections.idp_user_links3.idp_id = projections.idp_templates4.id AND projections.idp_user_links3.instance_id = projections.idp_templates4.instance_id` +
+		` LEFT JOIN projections.idp_templates5 ON projections.idp_user_links3.idp_id = projections.idp_templates5.id AND projections.idp_user_links3.instance_id = projections.idp_templates5.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 	idpUserLinksCols = []string{
 		"idp_id",
@@ -135,7 +135,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*IDPUserLinks)(nil),
 		},
 	}
 	for _, tt := range tests {

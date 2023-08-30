@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: 2-etapowe uwierzytelnianie daje Ci dodatkową ochronę dla Twojego konta użytkownika. Dzięki temu masz pewność, że tylko Ty masz dostęp do swojego konta.
   Provider0: Aplikacja uwierzytelniająca (np. Google/Microsoft Authenticator, Authy)
   Provider1: Zależny od urządzenia (np. FaceID, Windows Hello, Odcisk palca)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   NextButtonText: dalej
   SkipButtonText: pomiń
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Kod
   NextButtonText: dalej
   CancelButtonText: anuluj
+
+InitMFASMS:
+  Title: Weryfikacja 2-etapowa
+  DescriptionPhone: Utwórz uwierzytelnianie dwuskładnikowe. Wprowadź swój numer telefonu, aby go zweryfikować.
+  DescriptionCode: Utwórz uwierzytelnianie dwuskładnikowe. Wprowadź otrzymany kod, aby zweryfikować swój numer telefonu.
+  PhoneLabel: Numer telefonu
+  CodeLabel: Kod
+  EditButtonText: edytować
+  ResendButtonText: wyślij kod ponownie
+  NextButtonText: dalej
 
 InitMFAU2F:
   Title: Dodaj klucz zabezpieczeń
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: Aplikacja uwierzytelniająca (np. Google/Microsoft Authenticator, Authy)
   Provider1: Zależny od urządzenia (np. FaceID, Windows Hello, Odcisk palca)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   ChooseOther: lub wybierz inną opcję
 
 VerifyMFAOTP:
   Title: Zweryfikuj 2-etapowe uwierzytelnianie
   Description: Zweryfikuj swój drugi czynnik
   CodeLabel: Kod
+  NextButtonText: dalej
+
+VerifyOTP:
+  Title: Zweryfikuj 2-etapowe uwierzytelnianie
+  Description: Zweryfikuj swój drugi czynnik
+  CodeLabel: Kod
+  ResendButtonText: wyślij kod ponownie
   NextButtonText: dalej
 
 VerifyMFAU2F:
@@ -221,6 +242,10 @@ RegistrationUser:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   GenderLabel: Płeć
   Female: Kobieta
   Male: Mężczyzna
@@ -253,6 +278,10 @@ ExternalRegistrationUserOverview:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
   TosAndPrivacyLabel: Warunki i zasady
   TosConfirm: Akceptuję
   TosLinkText: Warunki korzystania
@@ -313,6 +342,28 @@ ExternalNotFound:
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+
+DeviceAuth:
+  Title: Autoryzacja urządzenia
+  UserCode:
+    Label: Kod użytkownika
+    Description: Wprowadź kod użytkownika prezentowany na urządzeniu.
+    ButtonNext: Następny
+  Action:
+    Description: Przyznaj dostęp do urządzenia.
+    GrantDevice: zamierzasz przyznać urządzenie
+    AccessToScopes: dostęp do następujących zakresów
+    Button:
+      Allow: umożliwić
+      Deny: zaprzeczyć
+  Done:
+    Description: Zrobione.
+    Approved: Zatwierdzono autoryzację urządzenia. Możesz teraz wrócić do urządzenia.
+    Denied: Odmowa autoryzacji urządzenia. Możesz teraz wrócić do urządzenia.
 
 Footer:
   PoweredBy: Obsługiwane przez
@@ -373,6 +424,7 @@ Errors:
       Empty: Hasło jest puste
       Invalid: Hasło jest niepoprawne
       InvalidAndLocked: Hasło jest niepoprawne i użytkownik jest zablokowany, skontaktuj się z administratorem.
+      NotChanged: Hasło nie zostało zmienione
     UsernameOrPassword:
       Invalid: Nazwa użytkownika lub hasło jest niepoprawne
     PasswordComplexityPolicy:
@@ -422,5 +474,7 @@ Errors:
   Org:
     LoginPolicy:
       RegistrationNotAllowed: Rejestracja nie jest dozwolona
+  DeviceAuth:
+    NotExisting: Kod użytkownika nie istnieje
 
 optional: (opcjonalny)

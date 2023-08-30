@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/cmd/key"
+	"github.com/zitadel/zitadel/cmd/ready"
 	"github.com/zitadel/zitadel/cmd/setup"
 	"github.com/zitadel/zitadel/cmd/start"
 )
@@ -26,7 +27,7 @@ var (
 	defaultConfig []byte
 )
 
-func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
+func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "zitadel",
 		Short: "The ZITADEL CLI lets you interact with ZITADEL",
@@ -51,10 +52,11 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 		admin.New(), //is now deprecated, remove later on
 		initialise.New(),
 		setup.New(),
-		start.New(),
-		start.NewStartFromInit(),
-		start.NewStartFromSetup(),
+		start.New(server),
+		start.NewStartFromInit(server),
+		start.NewStartFromSetup(server),
 		key.New(),
+		ready.New(),
 	)
 
 	cmd.InitDefaultVersionFlag()

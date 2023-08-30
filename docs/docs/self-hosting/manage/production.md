@@ -21,6 +21,9 @@ Read more about separating the init and setup phases on the [Updating and Scalin
 ## Configuration
 
 Read [on the configure page](/docs/self-hosting/manage/configure) about the available options you have to configure ZITADEL.
+Prefer passing .yaml files to the ZITADEL binary instead of environment variables.
+Restricting access to these files to avoid leaking sensitive information is easier than restricting access to environment variables.
+Also, not all configuration options are available as environment variables.
 
 ## Networking
 
@@ -45,6 +48,42 @@ Tracing:
   MetricPrefix: zitadel
 ```
 
+## Logging
+
+ZITADEL follows the principles that guide cloud-native and twelve factor applications.
+Logs are a stream of time-ordered events collected from all running processes.
+
+ZITADEL processes write the following events to the standard output:
+
+- Runtime Logs: Define the log level and record format [in the Log configuration section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L1-L4)
+- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L366) 
+- Actions Exectution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L387) .
+
+Log file management should not be in each business apps responsibility.
+Instead, your execution environment should provide tooling for managing logs in a generic way.
+This includes tasks like rotating files, routing, collecting, archiving and cleaning-up.
+For example, systemd has journald and kubernetes has fluentd and fluentbit.
+
+## Telemetry
+
+If you want to have some data about reached usage milestones pushed to external systems, enable telemetry in the ZITADEL configuration.
+
+The following table describes the milestones that are sent to the endpoints:
+
+| Trigger                                                                           | Description                                                                                                                                        |
+|-----------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| A virtual instance is created.                                                    | This data point is also sent when the first instance is automatically created during the ZITADEL binaries setup phase in a self-hosting scenario.  |
+| An authentication succeeded for the first time on an instance.                    | This is the first authentication with the instances automatically created admin user during the instance setup, which can be a human or a machine. |
+| A project is created for the first time in a virtual instance.                    | The ZITADEL project that is automatically created during the instance setup is omitted.                                                            |
+| An application is created for the first time in a virtual instance.               | The applications in the ZITADEL project that are automatically created during the instance setup are omitted.                                      |
+| An authentication succeeded for the first time in a virtal instances application. | This is the first authentication using a ZITADEL application that is not created during the instance setup phase.                                  |
+| A virtual instance is deleted.                                                    | This data point is sent when a virtual instance is deleted via ZITADELs system API                                                                 |
+
+
+ZITADEL pushes the metrics by projecting certain events.
+Therefore, you can configure delivery guarantees not in the Telemetry section of the ZITADEL configuration,
+but in the Projections.Customizations.Telemetry section
+
 ## Database
 
 ### Prefer CockroachDB
@@ -54,6 +93,11 @@ We highly recommend using CockroachDB,
 as horizontal scaling is much easier than with PostgreSQL.
 Also, if you are concerned about multi-regional data locality,
 [the way to go is with CockroachDB](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html).
+
+The indexes for the database are optimized using load tests from [ZITADEL Cloud](https://zitadel.com), 
+which runs with CockroachDB.
+If you identify problems with your Postgresql during load tests that indicate that the indexes are not optimized,
+please create an issue in our [github repository](https://github.com/zitadel/zitadel).
 
 ### Configure ZITADEL
 
@@ -84,14 +128,14 @@ Projections:
   RetryFailedAfter: 1s
   # Retried execution number of database statements resulting from projected events
   MaxFailureCount: 5
-  # Number of concurrent projection routines
+  # Number of concurrent projection routines. Values of 0 and below are overwritten to 1
   ConcurrentInstances: 1
   # Limit of returned events per query
   BulkLimit: 200
-  # If HandleInactiveInstances this is false, only instances are projected,
-  # for which at least a projection relevant event exists withing the timeframe
-  # from twice the RequeueEvery time in the past until the projections current time
-  HandleInactiveInstances: false
+  # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+  # from HandleActiveInstances duration in the past until the projections current time
+  # Defaults to twice the RequeueEvery duration
+  HandleActiveInstances: 120s
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     Projects:
@@ -103,14 +147,15 @@ Projections:
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
       # Delivery guarantee requirements are probably higher for quota webhooks
-      HandleInactiveInstances: true
+      # Defaults to 45 days
+      HandleActiveInstances: 1080h
       # As quota notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 0
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
       RequeueEvery: 300s
 ```
 
-### Manage your Data
+### Manage your data
 
 When designing your backup strategy,
 it is worth knowing that
@@ -129,7 +174,7 @@ please refer to the corresponding docs
 or [for PostgreSQL](https://www.postgresql.org/docs/current/admin.html).
 
 
-## Data Initialization
+## Data initialization
 
 - You can configure instance defaults in the DefaultInstance section.
   If you plan to eventually create [multiple virtual instances](/concepts/structure/instance#multiple-virtual-instances), these defaults take effect.
@@ -155,6 +200,7 @@ DefaultInstance:
     # if the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
     From:
     FromName:
+    ReplyToAddress:
 ```
 
 - If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/self-hosting/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
@@ -166,3 +212,19 @@ DefaultInstance:
 
 If you host ZITADEL as a service,
 you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/quotas).
+
+## Minimum system requirements
+
+### General resource usage
+
+ZITADEL consumes around 512MB RAM and can run with less than 1 CPU core.
+The database consumes around 2 CPU under normal conditions and 6GB RAM with some caching to it.
+
+:::info Password hashing
+Be aware of CPU spikes when hashing passwords. We recommend to have 4 CPU cores available for this purpose.
+:::
+
+### Production HA cluster
+
+It is recommended to build a minimal high-availability with 3 Nodes with 4 CPU and 16GB memory each.
+Excluding non-essential services, such as log collection, metrics etc, the resources could be reduced to around 4 CPU and  8GB memory each.

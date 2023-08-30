@@ -4,21 +4,23 @@
 </p>
 
 <p align="center">
+    <a href="https://github.com/zitadel/zitadel/blob/main/LICENSE" alt="License">
+        <img src="https://badgen.net/github/license/zitadel/zitadel/" /></a>
     <a href="https://bestpractices.coreinfrastructure.org/projects/6662"><img src="https://bestpractices.coreinfrastructure.org/projects/6662/badge"></a>
-    <a href="https://github.com/zitadel/zitadel/graphs/contributors" alt="Release">
-        <img src="https://badgen.net/github/contributors/zitadel/zitadel" /></a>
     <a href="https://github.com/semantic-release/semantic-release" alt="semantic-release">
         <img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" /></a>
     <a href="https://github.com/zitadel/zitadel/actions" alt="ZITADEL Release">
-        <img src="https://github.com/zitadel/zitadel/actions/workflows/zitadel.yml/badge.svg" /></a>
-    <a href="https://github.com/zitadel/zitadel/blob/main/LICENSE" alt="License">
-        <img src="https://badgen.net/github/license/zitadel/zitadel/" /></a>
+        <img alt="GitHub Workflow Status (with event)" src="https://img.shields.io/github/actions/workflow/status/zitadel/zitadel/build.yml?event=pull_request"></a>
     <a href="https://github.com/zitadel/zitadel/releases" alt="Release">
         <img src="https://badgen.net/github/release/zitadel/zitadel/stable" /></a>
+    <a href="https://github.com/zitadel/zitadel/releases" alt="Release">
+        <img alt="Dynamic YAML Badge" src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fzitadel%2Fzitadel%2Fmain%2Frelease-channels.yaml&query=%24.stable&label=stable"></a>
     <a href="https://goreportcard.com/report/github.com/zitadel/zitadel" alt="Go Report Card">
         <img src="https://goreportcard.com/badge/github.com/zitadel/zitadel" /></a>
     <a href="https://codecov.io/gh/zitadel/zitadel" alt="Code Coverage">
         <img src="https://codecov.io/gh/zitadel/zitadel/branch/main/graph/badge.svg" /></a>
+    <a href="https://github.com/zitadel/zitadel/graphs/contributors" alt="Release">
+        <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/zitadel/zitadel"></a>
     <a href="https://discord.gg/erh5Brh7jE" alt="Discord Chat">
         <img src="https://badgen.net/discord/online-members/erh5Brh7jE" /></a>
 </p>
@@ -30,12 +32,12 @@
 
 Do you look for a user management that's quickly set up like Auth0 and open source like Keycloak?
 
-Do you have project that requires a multi-tenant user management with self-service for your customers?
+Do you have a project that requires multi-tenant user management with self-service for your customers?
 
 Look no further — ZITADEL combines the ease of Auth0 with the versatility of Keycloak.
 
-We provide you with a wide range of out of the box features to accelerate your project.
-Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
+We provide you with a wide range of out-of-the-box features to accelerate your project.
+Multi-tenancy with branding customization, secure login, self-service, OpenID Connect, OAuth2.x, SAML2, LDAP, Passwordless with FIDO2 (including Passkeys), OTP, U2F, and an unlimited audit trail is there for you, ready to use.
 
 With ZITADEL you can rely on a hardened and extensible turnkey solution to solve all of your authentication and authorization needs.
 
@@ -90,20 +92,34 @@ Yet it offers everything you need for a customer identity ([CIAM](https://zitade
 
 ## Features
 
+Authentication
 - Single Sign On (SSO)
 - Passwordless with FIDO2 support (Including Passkeys)
 - Username / Password
-- Multifactor authentication with OTP, U2F
-- [Identity Brokering](https://zitadel.com/docs/guides/integrate/identity-brokering)
-- [Machine-to-machine (JWT profile)](https://zitadel.com/docs/guides/integrate/serviceusers)
-- Personal Access Tokens (PAT)
-- Role Based Access Control (RBAC)
-- [Delegate role management to third-parties](https://zitadel.com/docs/guides/manage/console/projects)
-- [Self-registration](https://zitadel.com/docs/concepts/features/selfservice#registration) including verification
-- [Self-service](https://zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
+- Multifactor authentication with OTP, U2F, Email OTP, SMS OTP
+- LDAP
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)
+- [Machine-to-machine](https://zitadel.com/docs/guides/integrate/serviceusers) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
+
+Multi-Tenancy
+- [Identity Brokering](https://zitadel.com/docs/guides/integrate/identity-brokering) with templates for popular identity providers
+- [Delegate role management to third-parties](https://zitadel.com/docs/guides/manage/console/projects)
+- [Domain discovery](https://zitadel.com/docs/guides/solution-scenarios/domain-discovery)
+
+Integration
+- [GRPC and REST APIs](https://zitadel.com/docs/apis/introduction)
+- [Actions](https://zitadel.com/docs/apis/actions/introduction) to call any API, send webhooks, adjust workflows, or customize tokens
+- [Role Based Access Control (RBAC)](https://zitadel.com/docs/guides/integrate/retrieve-user-roles)
+
+Self-Service
+- [Self-registration](https://zitadel.com/docs/concepts/features/selfservice#registration) including verification
+- [Self-service](https://zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
+- [Administration UI (Console)](https://zitadel.com/docs/guides/manage/console/overview)
+
+Deployment
 - [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14) or [CockroachDB](https://zitadel.com/docs/self-hosting/manage/database#cockroach) (version >= 22.0)
+- [Zero Downtime Updates](https://zitadel.com/docs/concepts/architecture/solution#zero-downtime-updates)
 
 Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
@@ -141,7 +157,9 @@ Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [A
 
 ## Security
 
-See the policy [here](./SECURITY.md)
+See the policy [here](./SECURITY.md).
+
+[Technical Advisories](https://zitadel.com/docs/support/technical_advisory) are published regarding major issues with the ZITADEL platform that could potentially impact security or stability in production environments.
 
 ## License
 

@@ -64,6 +64,11 @@ var (
 	NotificationPolicyProjection        *notificationPolicyProjection
 	NotificationsProjection             interface{}
 	NotificationsQuotaProjection        interface{}
+	TelemetryPusherProjection           interface{}
+	DeviceAuthProjection                *deviceAuthProjection
+	SessionProjection                   *sessionProjection
+	AuthRequestProjection               *authRequestProjection
+	MilestoneProjection                 *milestoneProjection
 )
 
 type projection interface {
@@ -81,11 +86,11 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 			HandlerConfig: handler.HandlerConfig{
 				Eventstore: es,
 			},
-			RequeueEvery:            config.RequeueEvery,
-			RetryFailedAfter:        config.RetryFailedAfter,
-			Retries:                 config.MaxFailureCount,
-			ConcurrentInstances:     config.ConcurrentInstances,
-			HandleInactiveInstances: config.HandleInactiveInstances,
+			RequeueEvery:          config.RequeueEvery,
+			RetryFailedAfter:      config.RetryFailedAfter,
+			Retries:               config.MaxFailureCount,
+			ConcurrentInstances:   config.ConcurrentInstances,
+			HandleActiveInstances: config.HandleActiveInstances,
 		},
 		Client:            sqlClient,
 		SequenceTable:     CurrentSeqTable,
@@ -139,6 +144,10 @@ func Create(ctx context.Context, sqlClient *database.DB, es *eventstore.Eventsto
 	KeyProjection = newKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), keyEncryptionAlgorithm, certEncryptionAlgorithm)
 	SecurityPolicyProjection = newSecurityPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["security_policies"]))
 	NotificationPolicyProjection = newNotificationPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["notification_policies"]))
+	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
+	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
+	AuthRequestProjection = newAuthRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["auth_requests"]))
+	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]))
 	newProjectionsList()
 	return nil
 }
@@ -175,8 +184,8 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 	if customConfig.RetryFailedAfter != nil {
 		config.RetryFailedAfter = *customConfig.RetryFailedAfter
 	}
-	if customConfig.HandleInactiveInstances != nil {
-		config.HandleInactiveInstances = *customConfig.HandleInactiveInstances
+	if customConfig.HandleActiveInstances != nil {
+		config.HandleActiveInstances = *customConfig.HandleActiveInstances
 	}
 
 	return config
@@ -187,7 +196,7 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 // as setup and start currently create them individually, we make sure we get the right one
 // will be refactored when changing to new id based projections
 //
-// NotificationsProjection is not added here, because it does not statement based / has no proprietary projection table
+// Event handlers NotificationsProjection, NotificationsQuotaProjection and NotificationsProjection are not added here, because they do not reduce to database statements
 func newProjectionsList() {
 	projections = []projection{
 		OrgProjection,
@@ -234,5 +243,9 @@ func newProjectionsList() {
 		KeyProjection,
 		SecurityPolicyProjection,
 		NotificationPolicyProjection,
+		DeviceAuthProjection,
+		SessionProjection,
+		AuthRequestProjection,
+		MilestoneProjection,
 	}
 }

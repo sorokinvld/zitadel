@@ -53,6 +53,7 @@ Errors:
     NotFoundOnOrg: User could not be found on chosen organization
     NotAllowedOrg: User is no member of the required organization
     UserIDMissing: User ID missing
+    UserIDWrong: "Request user not equal to authenticated user"
     DomainPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
     Invalid: Userdata is invalid
@@ -67,12 +68,13 @@ Errors:
     NoChanges: No changes found
     InitCodeNotFound: Initialization Code not found
     UsernameNotChanged: Username not changed
+    InvalidURLTemplate: URL Template is invalid
     Profile:
       NotFound: Profile not found
       NotChanged: Profile not changed
       Empty: Profile is empty
-      FirstNameEmpty: First name in profile is empty
-      LastNameEmpty: Last name in profile is empty
+      FirstNameEmpty: Given name in profile is empty
+      LastNameEmpty: Family name in profile is empty
       IDMissing: Profile ID is missing
     Email:
       NotFound: Email not found
@@ -105,7 +107,7 @@ Errors:
     WrongType: Not allowed for this user type
     NotAllowedToLink: User is not allowed to link with external login provider
     Username:
-      AlreadyExists:  Username already taken
+      AlreadyExists: Username already taken
       Reserved: Username is already taken
       Empty: Username is empty
     Code:
@@ -118,21 +120,24 @@ Errors:
       Empty: Password is empty
       Invalid: Password is invalid
       NotSet: User has not set a password
+      NotChanged: Password not changed
+      NotSupported: Password hash encoding not supported
     PasswordComplexityPolicy:
       NotFound: Password policy not found
-      MinLength: Password is to short
+      MinLength: Password is too short
       MinLengthNotAllowed: Given minimum length is not allowed
       HasLower: Password must contain lower case
       HasUpper: Password must contain upper case
       HasNumber: Password must contain number
       HasSymbol: Password must contain symbol
     ExternalIDP:
-      Invalid: Externer IDP invalid
+      Invalid: External IDP invalid
       IDPConfigNotExisting: IDP provider invalid for this organization
       NotAllowed: External IDP not allowed on this organization
       MinimumExternalIDPNeeded: At least one IDP must be added
       AlreadyExists: External IDP already taken
       NotFound: External IDP not found
+      LoginFailed: Login at External IDP failed
     MFA:
       OTP:
         AlreadyReady: Multifactor OTP (OneTimePassword) is already set up
@@ -469,7 +474,33 @@ Errors:
     Execution:
       StorageFailed: Storing action execution log to database failed
       ScanFailed: Querying usage for action execution seconds failed
-
+  Session:
+    NotExisting: Session does not exist
+    Terminated: Session already terminated
+    Token:
+      Invalid: Session Token is invalid
+    WebAuthN:
+      NoChallenge: Session without WebAuthN challenge
+  Intent:
+    IDPMissing: IDP ID is missing in the request
+    SuccessURLMissing: Success URL is missing in the request
+    FailureURLMissing: Failure URL is missing in the request
+    StateMissing: State parameter is missing in the request
+    NotStarted: Intent is not started or was already terminated
+    NotSucceeded: Intent has not succeeded
+    TokenCreationFailed: Token creation failed
+    InvalidToken: Intent Token is invalid
+    OtherUser: Intent meant for another user
+  AuthRequest:
+    AlreadyExists: Auth Request already exists
+    NotExisting: Auth Request does not exist
+    WrongLoginClient: Auth Request created by other login client
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token is invalid
+    Token:
+      Invalid: Token is invalid
+      Expired: Token is expired
+    InvalidClient: Token was not issued for this client
 
 AggregateTypes:
   action: Action
@@ -553,14 +584,20 @@ EventTypes:
         check:
           succeeded: Password check succeeded
           failed: Password check failed
+        change:
+          sent: Password change sent
+        hash:
+          updated: Password hash updated
       externallogin:
         check:
           succeeded: External login succeeded
       externalidp:
-        added: Externer IDP added
-        removed: Externer IDP removed
+        added: External IDP added
+        removed: External IDP removed
         cascade:
-          removed: Externer IDP cascade removed
+          removed: External IDP cascade removed
+        id:
+          migrated: External UserID of IDP was migrated
       phone:
         changed: Phone number changed
         verified: Phone number verified
@@ -582,6 +619,24 @@ EventTypes:
           check:
             succeeded: Multifactor OTP check succeeded
             failed: Multifactor OTP check failed
+          sms:
+            added: Multifactor OTP SMS added
+            removed: Multifactor OTP SMS removed
+            code:
+              added: Multifactor OTP SMS code added
+              sent: Multifactor OTP SMS code sent
+            check:
+              succeeded: Multifactor OTP SMS check succeeded
+              failed: Multifactor OTP SMS check failed
+          email:
+            added: Multifactor OTP Email added
+            removed: Multifactor OTP Email removed
+            code:
+              added: Multifactor OTP Email code added
+              sent: Multifactor OTP Email code sent
+            check:
+              succeeded: Multifactor OTP Email check succeeded
+              failed: Multifactor OTP Email check failed
         u2f:
           token:
             added: Multifactor U2F Token added
@@ -929,7 +984,7 @@ EventTypes:
       jwt:
         config:
           added: JWT configuration to identity provider added
-          changed: JWT configuration from identity provider remvoed
+          changed: JWT configuration from identity provider removed
     customtext:
       set: Text was set
       removed: Text was removed
@@ -1061,7 +1116,7 @@ EventTypes:
         changed: Label policy changed
         font:
           added: Font added to label policy
-          removed: Font remvoed from label policy
+          removed: Font removed from label policy
         icon:
           added: Icon added to label policy
           removed: Icon removed from label policy
@@ -1089,8 +1144,8 @@ EventTypes:
           added: Multifactor added to login policy
           removed: Multifactor removed from login policy
         secondfactor:
-          added: Secondfactor added to login policy
-          removed: Secondfactor removed from login policy
+          added: Second factor added to login policy
+          removed: Second factor removed from login policy
       password:
         age:
           added: Password age policy added
@@ -1162,6 +1217,7 @@ Action:
       ExternalAuthentication: External Authentication
       CustomiseToken: Complement Token
       InternalAuthentication: Internal Authentication
+      CustomizeSAMLResponse: Complement SAMLResponse
   TriggerType:
     Unspecified: Unspecified
     PostAuthentication: Post Authentication
@@ -1169,3 +1225,4 @@ Action:
     PostCreation: Post Creation
     PreUserinfoCreation: Pre Userinfo creation
     PreAccessTokenCreation: Pre access token creation
+    PreSAMLResponseCreation: Pre SAMLResponse creation

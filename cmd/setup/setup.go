@@ -45,6 +45,8 @@ Requirements:
 		},
 	}
 
+	cmd.AddCommand(NewCleanup())
+
 	Flags(cmd)
 
 	return cmd
@@ -73,8 +75,9 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.instanceSetup = config.DefaultInstance
 	steps.FirstInstance.userEncryptionKey = config.EncryptionKeys.User
 	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
+	steps.FirstInstance.oidcEncryptionKey = config.EncryptionKeys.OIDC
 	steps.FirstInstance.masterKey = masterKey
-	steps.FirstInstance.db = dbClient.DB
+	steps.FirstInstance.db = dbClient
 	steps.FirstInstance.es = eventstoreClient
 	steps.FirstInstance.defaults = config.SystemDefaults
 	steps.FirstInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
@@ -88,6 +91,10 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
 	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
 	steps.s9EventstoreIndexes2 = New09(dbClient)
+	steps.CorrectCreationDate.dbClient = dbClient
+	steps.AddEventCreatedAt.dbClient = dbClient
+	steps.AddEventCreatedAt.step10 = steps.CorrectCreationDate
+	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -98,6 +105,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 			ExternalDomain: config.ExternalDomain,
 			ExternalPort:   config.ExternalPort,
 			ExternalSecure: config.ExternalSecure,
+			defaults:       config.SystemDefaults,
 		},
 		&projectionTables{
 			es:      eventstoreClient,
@@ -123,6 +131,12 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.OnError(err).Fatal("unable to migrate step 8")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s9EventstoreIndexes2)
 	logging.OnError(err).Fatal("unable to migrate step 9")
+	err = migration.Migrate(ctx, eventstoreClient, steps.CorrectCreationDate)
+	logging.OnError(err).Fatal("unable to migrate step 10")
+	err = migration.Migrate(ctx, eventstoreClient, steps.AddEventCreatedAt)
+	logging.OnError(err).Fatal("unable to migrate step 11")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s12AddOTPColumns)
+	logging.OnError(err).Fatal("unable to migrate step 12")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

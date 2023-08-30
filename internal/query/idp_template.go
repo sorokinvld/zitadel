@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
@@ -607,13 +606,12 @@ var (
 )
 
 // IDPTemplateByID searches for the requested id
-func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (_ *IDPTemplate, err error) {
+func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (template *IDPTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		err := projection.IDPTemplateProjection.Trigger(ctx)
-		logging.OnError(err).WithField("projection", idpTemplateTable.identifier()).Warn("could not trigger projection for query")
+		ctx = projection.IDPTemplateProjection.Trigger(ctx)
 	}
 
 	eq := sq.Eq{
@@ -632,8 +630,11 @@ func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, i
 		return nil, errors.ThrowInternal(err, "QUERY-SFefg", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		template, err = scan(row)
+		return err
+	}, stmt, args...)
+	return template, err
 }
 
 // IDPTemplates searches idp templates matching the query
@@ -653,13 +654,12 @@ func (q *Queries) IDPTemplates(ctx context.Context, queries *IDPTemplateSearchQu
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-SAF34", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		idps, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-BDFrq", "Errors.Internal")
-	}
-	idps, err = scan(rows)
-	if err != nil {
-		return nil, err
 	}
 	idps.LatestSequence, err = q.latestSequence(ctx, idpTemplateTable)
 	return idps, err

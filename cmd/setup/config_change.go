@@ -17,6 +17,7 @@ type externalConfigChange struct {
 	currentExternalDomain string
 	currentExternalSecure bool
 	currentExternalPort   uint16
+	defaults              systemdefaults.SystemDefaults
 }
 
 func (mig *externalConfigChange) SetLastExecution(lastRun map[string]interface{}) {
@@ -33,8 +34,9 @@ func (mig *externalConfigChange) Check() bool {
 }
 
 func (mig *externalConfigChange) Execute(ctx context.Context) error {
-	cmd, err := command.StartCommands(mig.es,
-		systemdefaults.SystemDefaults{},
+	cmd, err := command.StartCommands(
+		mig.es,
+		mig.defaults,
 		nil,
 		nil,
 		nil,
@@ -49,6 +51,12 @@ func (mig *externalConfigChange) Execute(ctx context.Context) error {
 		nil,
 		nil,
 		nil,
+		nil,
+		nil,
+		nil,
+		0,
+		0,
+		0,
 		nil,
 	)
 

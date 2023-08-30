@@ -27,6 +27,7 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 @Component({
   selector: 'cnsl-provider-oidc',
   templateUrl: './provider-oidc.component.html',
+  styleUrls: ['./provider-oidc.component.scss'],
 })
 export class ProviderOIDCComponent {
   public showOptional: boolean = false;
@@ -56,10 +57,11 @@ export class ProviderOIDCComponent {
       clientSecret: new UntypedFormControl('', [requiredValidator]),
       issuer: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
+      isIdTokenMapping: new UntypedFormControl(),
     });
 
     this.route.data.pipe(take(1)).subscribe((data) => {
-      this.serviceType = data.serviceType;
+      this.serviceType = data['serviceType'];
 
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
@@ -130,6 +132,8 @@ export class ProviderOIDCComponent {
     req.setClientSecret(this.clientSecret?.value);
     req.setIssuer(this.issuer?.value);
     req.setScopesList(this.scopesList?.value);
+    req.setProviderOptions(this.options);
+    req.setIsIdTokenMapping(this.isIdTokenMapping?.value);
 
     this.loading = true;
     this.service
@@ -158,6 +162,8 @@ export class ProviderOIDCComponent {
       req.setClientSecret(this.clientSecret?.value);
       req.setIssuer(this.issuer?.value);
       req.setScopesList(this.scopesList?.value);
+      req.setProviderOptions(this.options);
+      req.setIsIdTokenMapping(this.isIdTokenMapping?.value);
 
       this.loading = true;
       this.service
@@ -221,5 +227,9 @@ export class ProviderOIDCComponent {
 
   public get scopesList(): AbstractControl | null {
     return this.form.get('scopesList');
+  }
+
+  public get isIdTokenMapping(): AbstractControl | null {
+    return this.form.get('isIdTokenMapping');
   }
 }
