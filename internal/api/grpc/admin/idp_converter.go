@@ -1,6 +1,8 @@
 package admin
 
 import (
+	"github.com/crewjam/saml"
+
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
@@ -9,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 )
 
 func addOIDCIDPRequestToDomain(req *admin_pb.AddOIDCIDPRequest) *domain.IDPConfig {
@@ -438,5 +441,66 @@ func updateLDAPProviderToCommand(req *admin_pb.UpdateLDAPProviderRequest) comman
 		Timeout:           req.Timeout.AsDuration(),
 		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addAppleProviderToCommand(req *admin_pb.AddAppleProviderRequest) command.AppleProvider {
+	return command.AppleProvider{
+		Name:       req.Name,
+		ClientID:   req.ClientId,
+		TeamID:     req.TeamId,
+		KeyID:      req.KeyId,
+		PrivateKey: req.PrivateKey,
+		Scopes:     req.Scopes,
+		IDPOptions: idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateAppleProviderToCommand(req *admin_pb.UpdateAppleProviderRequest) command.AppleProvider {
+	return command.AppleProvider{
+		Name:       req.Name,
+		ClientID:   req.ClientId,
+		TeamID:     req.TeamId,
+		KeyID:      req.KeyId,
+		PrivateKey: req.PrivateKey,
+		Scopes:     req.Scopes,
+		IDPOptions: idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) command.SAMLProvider {
+	return command.SAMLProvider{
+		Name:              req.Name,
+		Metadata:          req.GetMetadataXml(),
+		MetadataURL:       req.GetMetadataUrl(),
+		Binding:           bindingToCommand(req.Binding),
+		WithSignedRequest: req.WithSignedRequest,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) command.SAMLProvider {
+	return command.SAMLProvider{
+		Name:              req.Name,
+		Metadata:          req.GetMetadataXml(),
+		MetadataURL:       req.GetMetadataUrl(),
+		Binding:           bindingToCommand(req.Binding),
+		WithSignedRequest: req.WithSignedRequest,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func bindingToCommand(binding idp_pb.SAMLBinding) string {
+	switch binding {
+	case idp_pb.SAMLBinding_SAML_BINDING_UNSPECIFIED:
+		return ""
+	case idp_pb.SAMLBinding_SAML_BINDING_POST:
+		return saml.HTTPPostBinding
+	case idp_pb.SAMLBinding_SAML_BINDING_REDIRECT:
+		return saml.HTTPRedirectBinding
+	case idp_pb.SAMLBinding_SAML_BINDING_ARTIFACT:
+		return saml.HTTPArtifactBinding
+	default:
+		return ""
 	}
 }

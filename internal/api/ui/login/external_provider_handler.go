@@ -5,19 +5,22 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
@@ -26,6 +29,8 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
@@ -41,6 +46,12 @@ type externalIDPData struct {
 type externalIDPCallbackData struct {
 	State string `schema:"state"`
 	Code  string `schema:"code"`
+
+	RelayState string `schema:"RelayState"`
+	Method     string `schema:"Method"`
+
+	// Apple returns a user on first registration
+	User string `schema:"user"`
 }
 
 type externalNotFoundOptionFormData struct {
@@ -159,8 +170,12 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.gitlabSelfHostedProvider(r.Context(), identityProvider)
 	case domain.IDPTypeGoogle:
 		provider, err = l.googleProvider(r.Context(), identityProvider)
+	case domain.IDPTypeApple:
+		provider, err = l.appleProvider(r.Context(), identityProvider)
 	case domain.IDPTypeLDAP:
 		provider, err = l.ldapProvider(r.Context(), identityProvider)
+	case domain.IDPTypeSAML:
+		provider, err = l.samlProvider(r.Context(), identityProvider)
 	case domain.IDPTypeUnspecified:
 		fallthrough
 	default:
@@ -177,7 +192,30 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
-	http.Redirect(w, r, session.GetAuthURL(), http.StatusFound)
+
+	content, redirect := session.GetAuth(r.Context())
+	if redirect {
+		http.Redirect(w, r, content, http.StatusFound)
+		return
+	}
+	_, err = w.Write([]byte(content))
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+}
+
+// handleExternalLoginCallbackForm handles the callback from a IDP with form_post.
+// It will redirect to the "normal" callback endpoint with the form data as query parameter.
+// This way cookies will be handled correctly (same site = lax).
+func (l *Login) handleExternalLoginCallbackForm(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		l.renderLogin(w, r, nil, err)
+		return
+	}
+	r.Form.Add("Method", http.MethodPost)
+	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+r.Form.Encode(), 302)
 }
 
 // handleExternalLoginCallback handles the callback from a IDP
@@ -189,6 +227,15 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.renderLogin(w, r, nil, err)
 		return
 	}
+	if data.State == "" {
+		data.State = data.RelayState
+	}
+	// workaround because of CSRF on external identity provider flows
+	if data.Method == http.MethodPost {
+		r.Method = http.MethodPost
+		r.PostForm = r.Form
+	}
+
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
 	if err != nil {
@@ -259,6 +306,25 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &openid.Session{Provider: provider.(*google.Provider).Provider, Code: data.Code}
+	case domain.IDPTypeApple:
+		provider, err = l.appleProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &apple.Session{Session: &openid.Session{Provider: provider.(*apple.Provider).Provider, Code: data.Code}, UserFormValue: data.User}
+	case domain.IDPTypeSAML:
+		provider, err = l.samlProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		sp, err := provider.(*saml.Provider).GetSP()
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &saml.Session{ServiceProvider: sp, RequestID: authReq.SAMLRequestID, Request: r}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:
@@ -856,6 +922,49 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 	)
 }
 
+func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*saml.Provider, error) {
+	key, err := crypto.Decrypt(identityProvider.SAMLIDPTemplate.Key, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]saml.ProviderOpts, 0, 2)
+	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
+		opts = append(opts, saml.WithSignedRequest())
+	}
+	if identityProvider.SAMLIDPTemplate.Binding != "" {
+		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
+	}
+	opts = append(opts,
+		saml.WithEntityID(http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure)+"/idps/"+identityProvider.ID+"/saml/metadata"),
+		saml.WithCustomRequestTracker(
+			requesttracker.New(
+				func(ctx context.Context, authRequestID, samlRequestID string) error {
+					useragent, _ := http_mw.UserAgentIDFromCtx(ctx)
+					return l.authRepo.SaveSAMLRequestID(ctx, authRequestID, samlRequestID, useragent)
+				},
+				func(ctx context.Context, authRequestID string) (*samlsp.TrackedRequest, error) {
+					useragent, _ := http_mw.UserAgentIDFromCtx(ctx)
+					auhRequest, err := l.authRepo.AuthRequestByID(ctx, authRequestID, useragent)
+					if err != nil {
+						return nil, err
+					}
+					return &samlsp.TrackedRequest{
+						SAMLRequestID: auhRequest.SAMLRequestID,
+						Index:         authRequestID,
+					}, nil
+				},
+			),
+		))
+	return saml.New(
+		identityProvider.Name,
+		l.baseURL(ctx)+EndpointExternalLogin+"/",
+		identityProvider.SAMLIDPTemplate.Metadata,
+		identityProvider.SAMLIDPTemplate.Certificate,
+		key,
+		opts...,
+	)
+}
+
 func (l *Login) azureProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*azuread.Provider, error) {
 	secret, err := crypto.DecryptString(identityProvider.AzureADIDPTemplate.ClientSecret, l.idpConfigAlg)
 	if err != nil {
@@ -936,6 +1045,21 @@ func (l *Login) gitlabSelfHostedProvider(ctx context.Context, identityProvider *
 	)
 }
 
+func (l *Login) appleProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*apple.Provider, error) {
+	privateKey, err := crypto.Decrypt(identityProvider.AppleIDPTemplate.PrivateKey, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	return apple.New(
+		identityProvider.AppleIDPTemplate.ClientID,
+		identityProvider.AppleIDPTemplate.TeamID,
+		identityProvider.AppleIDPTemplate.KeyID,
+		l.baseURL(ctx)+EndpointExternalLoginCallbackFormPost,
+		privateKey,
+		identityProvider.AppleIDPTemplate.Scopes,
+	)
+}
+
 func (l *Login) appendUserGrants(ctx context.Context, userGrants []*domain.UserGrant, resourceOwner string) error {
 	if len(userGrants) == 0 {
 		return nil
@@ -970,6 +1094,8 @@ func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 	case *oauth.Session:
 		return s.Tokens
 	case *azuread.Session:
+		return s.Tokens
+	case *apple.Session:
 		return s.Tokens
 	}
 	return nil
@@ -1047,8 +1173,9 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 	}
 }
 
-func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []any {
-	params := []any{authReq.AgentID}
+func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []idp.Parameter {
+	params := make([]idp.Parameter, 1, 2)
+	params[0] = idp.UserAgentID(authReq.AgentID)
 
 	if authReq.UserID != "" && identityProviderID != "" {
 		links, err := l.getUserLinks(ctx, authReq.UserID, identityProviderID)
@@ -1057,25 +1184,19 @@ func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domai
 			return params
 		}
 		if len(links.Links) == 1 {
-			return append(params, keyAndValueToAuthURLOpt("login_hint", links.Links[0].ProvidedUsername))
+			return append(params, idp.LoginHintParam(links.Links[0].ProvidedUsername))
 		}
 	}
 	if authReq.UserName != "" {
-		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.UserName))
+		return append(params, idp.LoginHintParam(authReq.UserName))
 	}
 	if authReq.LoginName != "" {
-		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginName))
+		return append(params, idp.LoginHintParam(authReq.LoginName))
 	}
 	if authReq.LoginHint != "" {
-		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginHint))
+		return append(params, idp.LoginHintParam(authReq.LoginHint))
 	}
 	return params
-}
-
-func keyAndValueToAuthURLOpt(key, value string) rp.AuthURLOpt {
-	return func() []oauth2.AuthCodeOption {
-		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
-	}
 }
 
 func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.IDPUserLinks, error) {

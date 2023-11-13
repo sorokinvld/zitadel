@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func (s *Server) PasswordReset(ctx context.Context, req *user.PasswordResetRequest) (_ *user.PasswordResetResponse, err error) {
@@ -48,7 +48,7 @@ func notificationTypeToDomain(notificationType user.NotificationType) domain.Not
 }
 
 func (s *Server) SetPassword(ctx context.Context, req *user.SetPasswordRequest) (_ *user.SetPasswordResponse, err error) {
-	var resourceOwner = authz.GetCtxData(ctx).ResourceOwner
+	var resourceOwner = authz.GetCtxData(ctx).OrgID
 	var details *domain.ObjectDetails
 
 	switch v := req.GetVerification().(type) {

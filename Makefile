@@ -3,7 +3,7 @@ gen_authopt_path := "$(go_bin)/protoc-gen-authoption"
 gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 
 now := $(shell date --rfc-3339=seconds | sed 's/ /T/')
-VERSION ?= development
+VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
 
 .PHONY: compile
@@ -44,12 +44,12 @@ endif
 
 .PHONY: core_grpc_dependencies
 core_grpc_dependencies:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.30 
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31 
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2 
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2 
-	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
-	go install github.com/bufbuild/buf/cmd/buf@v1.25.1
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.18.1 
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.18.1 
+	go install github.com/envoyproxy/protoc-gen-validate@v1.0.2
+	go install github.com/bufbuild/buf/cmd/buf@v1.27.2
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
@@ -83,7 +83,7 @@ console_build: console_dependencies console_client
 
 .PHONY: clean
 clean:
-	$(RM) .artifacts/grpc
+	$(RM) -r .artifacts/grpc
 	$(RM) $(gen_authopt_path)
 	$(RM) $(gen_zitadel_path)
 

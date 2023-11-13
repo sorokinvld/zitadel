@@ -18,7 +18,7 @@ SelectAccount:
   DescriptionLinking: アカウントを選択して、外部ユーザーにリンクします。
   OtherUser: その他のユーザー
   SessionState0: アクティブ
-  SessionState1: 非アクティブ
+  SessionState1: ログアウトしました
   MustBeMemberOfOrg: ユーザーは組織 {{.OrgName}} のメンバーである必要があります。
 
 Password:
@@ -238,6 +238,8 @@ RegistrationUser:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
   GenderLabel: 性別
   Female: 女性
   Male: 男性
@@ -274,6 +276,8 @@ ExternalRegistrationUserOverview:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
   TosAndPrivacyLabel: 利用規約
   TosConfirm: 私は利用規約を承諾します。
   TosLinkText: TOS
@@ -338,6 +342,8 @@ ExternalNotFound:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
 
 DeviceAuth:
   Title: デバイス認証
@@ -363,6 +369,8 @@ Footer:
   PrivacyPolicy: プライバシーポリシー
   Help: ヘルプ
 
+SignIn: '{{.Provider}} でサインイン'
+
 Errors:
   Internal: 内部でエラーが発生しました
   AuthRequest:
@@ -387,7 +395,7 @@ Errors:
       Empty: パスワードが空です
       Invalid: 無効なパスワードです
       InvalidAndLocked: パスワードが無効かつユーザーがロックされているため、管理者に連絡してください。
-      NotChanged: パスワードは変更されていません
+      NotChanged: 新しいパスワードは現在のパスワードと同じにすることはできません
     UsernameOrPassword:
       Invalid: ユーザー名またはパスワードは無効です
     PasswordComplexityPolicy:

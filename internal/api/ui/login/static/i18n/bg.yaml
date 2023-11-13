@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: 'Изберете своя акаунт, който да свържете с вашия външен потребител.'
   OtherUser: Друг потребител
   SessionState0: активен
-  SessionState1: неактивен
+  SessionState1: Не сте в профила си
   MustBeMemberOfOrg: 'Потребителят трябва да е член на {{.OrgName}} организация.'
 Password:
   Title: Парола
@@ -242,6 +242,8 @@ RegistrationUser:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -277,6 +279,8 @@ ExternalRegistrationUserOverview:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -336,7 +340,8 @@ ExternalNotFound:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
-  
+  Czech: Čeština
+  Russian: Русский
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:
@@ -360,6 +365,7 @@ Footer:
   PrivacyPolicy: Политика за поверителност
   Help: Помогне
   SupportEmail: Поддръжка на имейл
+SignIn: Влезте с {{.Provider}}
 Errors:
   Internal: Възникна вътрешна грешка
   AuthRequest:
@@ -414,7 +420,7 @@ Errors:
       InvalidAndLocked: >-
         Паролата е невалидна и потребителят е заключен, свържете се с вашия
         администратор.
-      NotChanged: Паролата не е променена
+      NotChanged: Новата парола не може да съвпада с текущата парола
     UsernameOrPassword:
       Invalid: Потребителското име или паролата са невалидни
     PasswordComplexityPolicy:

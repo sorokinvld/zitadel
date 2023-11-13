@@ -110,6 +110,25 @@ type LDAPProvider struct {
 	IDPOptions        idp.Options
 }
 
+type SAMLProvider struct {
+	Name              string
+	Metadata          []byte
+	MetadataURL       string
+	Binding           string
+	WithSignedRequest bool
+	IDPOptions        idp.Options
+}
+
+type AppleProvider struct {
+	Name       string
+	ClientID   string
+	TeamID     string
+	KeyID      string
+	PrivateKey []byte
+	Scopes     []string
+	IDPOptions idp.Options
+}
+
 func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id, orgID string) (exists bool, err error) {
 	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
 	events, err := filter(ctx, writeModel.Query())

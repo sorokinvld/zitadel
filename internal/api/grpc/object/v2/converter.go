@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
@@ -26,9 +26,7 @@ func ToListDetails(response query.SearchResponse) *object.ListDetails {
 	details := &object.ListDetails{
 		TotalResult:       response.Count,
 		ProcessedSequence: response.Sequence,
-	}
-	if !response.Timestamp.IsZero() {
-		details.Timestamp = timestamppb.New(response.Timestamp)
+		Timestamp:         timestamppb.New(response.EventCreatedAt),
 	}
 
 	return details
