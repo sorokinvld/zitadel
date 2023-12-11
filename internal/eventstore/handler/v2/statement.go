@@ -3,7 +3,7 @@ package handler
 import (
 	"database/sql"
 	"encoding/json"
-	errs "errors"
+	"errors"
 	"strconv"
 	"strings"
 	"time"
@@ -11,21 +11,32 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
 	statements = make([]*Statement, 0, len(events))
+
+	previousPosition := currentState.position
+	offset := currentState.offset
 	for _, event := range events {
 		statement, err := h.reduce(event)
 		if err != nil {
 			h.logEvent(event).WithError(err).Error("reduce failed")
-			if shouldContinue := h.handleFailedStmt(tx, currentState, failureFromEvent(event, err)); shouldContinue {
+			if shouldContinue := h.handleFailedStmt(tx, failureFromEvent(event, err)); shouldContinue {
 				continue
 			}
 			return statements, err
 		}
+		offset++
+		if previousPosition != event.Position() {
+			// offset is 1 because we want to skip this event
+			offset = 1
+		}
+		statement.offset = offset
+		statement.Position = event.Position()
+		previousPosition = event.Position()
 		statements = append(statements, statement)
 	}
 	return statements, nil
@@ -54,6 +65,8 @@ type Statement struct {
 	CreationDate  time.Time
 	InstanceID    string
 
+	offset uint16
+
 	Execute Exec
 }
 
@@ -66,9 +79,9 @@ func WithTableSuffix(name string) func(*execConfig) {
 }
 
 var (
-	ErrNoProjection = errs.New("no projection")
-	ErrNoValues     = errs.New("no values")
-	ErrNoCondition  = errs.New("no condition")
+	ErrNoProjection = errors.New("no projection")
+	ErrNoValues     = errors.New("no values")
+	ErrNoCondition  = errors.New("no condition")
 )
 
 func NewStatement(event eventstore.Event, e Exec) *Statement {
@@ -545,7 +558,7 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 
 		_, err = ex.Exec("SAVEPOINT stmt_exec")
 		if err != nil {
-			return errors.ThrowInternal(err, "CRDB-YdOXD", "create savepoint failed")
+			return zerrors.ThrowInternal(err, "CRDB-YdOXD", "create savepoint failed")
 		}
 		defer func() {
 			if err != nil {
@@ -557,7 +570,7 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 		}()
 		_, err = ex.Exec(q(config), config.args...)
 		if err != nil {
-			return errors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
+			return zerrors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
 		}
 
 		return nil
