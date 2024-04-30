@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
@@ -132,6 +133,7 @@ func SecretGeneratorTypeToDomain(generatorType settings_pb.SecretGeneratorType) 
 
 func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.Config {
 	return &smtp.Config{
+		Description:    req.Description,
 		Tls:            req.Tls,
 		From:           req.SenderAddress,
 		FromName:       req.SenderName,
@@ -146,26 +148,30 @@ func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.Config {
 
 func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.Config {
 	return &smtp.Config{
+		Description:    req.Description,
 		Tls:            req.Tls,
 		From:           req.SenderAddress,
 		FromName:       req.SenderName,
 		ReplyToAddress: req.ReplyToAddress,
 		SMTP: smtp.SMTP{
-			Host: req.Host,
-			User: req.User,
+			Host:     req.Host,
+			User:     req.User,
+			Password: req.Password,
 		},
 	}
 }
 
 func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 	mapped := &settings_pb.SMTPConfig{
+		Description:    smtp.Description,
 		Tls:            smtp.TLS,
 		SenderAddress:  smtp.SenderAddress,
 		SenderName:     smtp.SenderName,
 		ReplyToAddress: smtp.ReplyToAddress,
 		Host:           smtp.Host,
 		User:           smtp.User,
-		Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.AggregateID),
+		Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.ResourceOwner),
+		Id:             smtp.ID,
 	}
 	return mapped
 }
@@ -173,7 +179,16 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 func SecurityPolicyToPb(policy *query.SecurityPolicy) *settings_pb.SecurityPolicy {
 	return &settings_pb.SecurityPolicy{
 		Details:               obj_grpc.ToViewDetailsPb(policy.Sequence, policy.CreationDate, policy.ChangeDate, policy.AggregateID),
-		EnableIframeEmbedding: policy.Enabled,
+		EnableIframeEmbedding: policy.EnableIframeEmbedding,
 		AllowedOrigins:        policy.AllowedOrigins,
+		EnableImpersonation:   policy.EnableImpersonation,
+	}
+}
+
+func securityPolicyToCommand(req *admin_pb.SetSecurityPolicyRequest) *command.SecurityPolicy {
+	return &command.SecurityPolicy{
+		EnableIframeEmbedding: req.GetEnableIframeEmbedding(),
+		AllowedOrigins:        req.GetAllowedOrigins(),
+		EnableImpersonation:   req.GetEnableImpersonation(),
 	}
 }

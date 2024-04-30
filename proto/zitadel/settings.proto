@@ -40,6 +40,12 @@ message SecretGeneratorTypeQuery {
   SecretGeneratorType generator_type = 1;
 }
 
+enum SMTPConfigState {
+  SMTP_CONFIG_STATE_UNSPECIFIED = 0;
+  SMTP_CONFIG_ACTIVE = 1;
+  SMTP_CONFIG_INACTIVE = 2;
+}
+
 enum SecretGeneratorType {
   SECRET_GENERATOR_TYPE_UNSPECIFIED = 0;
   SECRET_GENERATOR_TYPE_INIT_CODE = 1;
@@ -80,6 +86,13 @@ message SMTPConfig {
       example: "\"replyto@m.zitadel.cloud\"";
     }
   ];
+  SMTPConfigState state = 8;
+  string description = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Mailjet\"";
+    }
+  ];
+  string id = 10;
 }
 
 message SMSProvider {
@@ -122,4 +135,6 @@ message SecurityPolicy {
   bool enable_iframe_embedding = 2;
   // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
   repeated string allowed_origins = 3;
+  // allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
+  bool enable_impersonation = 4;
 }

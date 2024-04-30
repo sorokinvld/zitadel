@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -24,10 +25,12 @@ import (
 )
 
 var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client session.SessionServiceClient
-	User   *user.AddHumanUserResponse
+	CTX             context.Context
+	Tester          *integration.Tester
+	Client          session.SessionServiceClient
+	User            *user.AddHumanUserResponse
+	DeactivatedUser *user.AddHumanUserResponse
+	LockedUser      *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
@@ -49,8 +52,12 @@ func TestMain(m *testing.M) {
 			UserId:           User.GetUserId(),
 			VerificationCode: User.GetPhoneCode(),
 		})
-		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword)
+		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword, false)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
+		DeactivatedUser = Tester.CreateHumanUser(CTX)
+		Tester.Client.UserV2.DeactivateUser(CTX, &user.DeactivateUserRequest{UserId: DeactivatedUser.GetUserId()})
+		LockedUser = Tester.CreateHumanUser(CTX)
+		Tester.Client.UserV2.LockUser(CTX, &user.LockUserRequest{UserId: LockedUser.GetUserId()})
 		return m.Run()
 	}())
 }
@@ -158,6 +165,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -177,6 +185,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -205,6 +214,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -224,10 +234,37 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
 			wantFactors: []wantFactor{wantUserFactor},
+		},
+		{
+			name: "deactivated user",
+			req: &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: DeactivatedUser.GetUserId(),
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "locked user",
+			req: &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: LockedUser.GetUserId(),
+						},
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
 			name: "password without user error",
@@ -351,6 +388,27 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 	})
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantIntentFactor)
+}
+
+func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
+	idpID := Tester.AddGenericOAuthProvider(t)
+
+	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, idpID, User.GetUserId(), "id")
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: User.GetUserId(),
+				},
+			},
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: token,
+			},
+		},
+	})
+	require.NoError(t, err)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantIntentFactor)
 }
 
 func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
@@ -680,11 +738,11 @@ func TestServer_DeleteSession_token(t *testing.T) {
 func TestServer_DeleteSession_own_session(t *testing.T) {
 	// create two users for the test and a session each to get tokens for authorization
 	user1 := Tester.CreateHumanUser(CTX)
-	Tester.SetUserPassword(CTX, user1.GetUserId(), integration.UserPassword)
+	Tester.SetUserPassword(CTX, user1.GetUserId(), integration.UserPassword, false)
 	_, token1, _, _ := Tester.CreatePasswordSession(t, CTX, user1.GetUserId(), integration.UserPassword)
 
 	user2 := Tester.CreateHumanUser(CTX)
-	Tester.SetUserPassword(CTX, user2.GetUserId(), integration.UserPassword)
+	Tester.SetUserPassword(CTX, user2.GetUserId(), integration.UserPassword, false)
 	_, token2, _, _ := Tester.CreatePasswordSession(t, CTX, user2.GetUserId(), integration.UserPassword)
 
 	// create a new session for the first user
@@ -705,7 +763,7 @@ func TestServer_DeleteSession_own_session(t *testing.T) {
 	})
 	require.Error(t, err)
 
-	// delete the new (user1) session by himself
+	// delete the new (user1) session by themselves
 	_, err = Client.DeleteSession(Tester.WithAuthorizationToken(context.Background(), token1), &session.DeleteSessionRequest{
 		SessionId: createResp.GetSessionId(),
 	})

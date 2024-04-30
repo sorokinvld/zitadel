@@ -440,6 +440,14 @@ service ManagementService {
             description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login."
             tags: "Users";
             deprecated: true;
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -490,6 +498,14 @@ service ManagementService {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -512,6 +528,14 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
             };
         };
     }
@@ -536,6 +560,14 @@ service ManagementService {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -558,6 +590,14 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
             };
         };
     }
@@ -582,6 +622,14 @@ service ManagementService {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -603,6 +651,14 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
             };
         };
     }
@@ -626,6 +682,14 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
             };
         };
     }
@@ -1147,6 +1211,14 @@ service ManagementService {
             tags: "User Human";
             summary: "Set Human Initial Password";
             deprecated: true;
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -1662,7 +1734,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create Key for machine user";
-            description: "A new key is generated and will be returned in the response. Make sure to store the returned key. Machine keys are used to authenticate with jwt profile."
+            description: "If a public key is not supplied, a new key is generated and will be returned in the response. Make sure to store the returned key. If an RSA public key is supplied, the private key is omitted from the response. Machine keys are used to authenticate with jwt profile."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -4142,6 +4214,14 @@ service ManagementService {
             summary: "Get Org IAM Policy";
             description: "Use Get Domain Settings instead"
             deprecated: true;
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7777,7 +7857,7 @@ message ImportHumanUserRequest {
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 min_length: 1;
                 max_length: 200;
-                example: "\"idp-config-id\"";
+                example: "\"external-user-id\"";
                 description: "The id of the user in the external identity provider"
             }
         ];
@@ -8422,6 +8502,12 @@ message AddMachineKeyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2519-04-01T08:45:00.000000Z\"";
             description: "The date the key will expire and no logins will be possible";
+        }
+    ];
+    bytes public_key = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+           example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
+           description: "Optionally provide a public key of your own generated RSA private key.";
         }
     ];
 }
@@ -10332,6 +10418,12 @@ message AddCustomLockoutPolicyRequest {
             description: "When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger."
         }
     ];
+    uint32 max_otp_attempts = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum failed attempts for a single OTP type (TOTP, SMS, Email) before the account gets locked. Attempts are reset as soon as the OTP is entered correctly. If set to 0 the account will never be locked."
+            example: "\"10\""
+        }
+    ];
 }
 
 message AddCustomLockoutPolicyResponse {
@@ -10342,6 +10434,12 @@ message UpdateCustomLockoutPolicyRequest {
     uint32 max_password_attempts = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger."
+        }
+    ];
+    uint32 max_otp_attempts = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum failed attempts for a single OTP type (TOTP, SMS, Email) before the account gets locked. Attempts are reset as soon as the OTP is entered correctly. If set to 0 the account will never be locked."
+            example: "\"10\""
         }
     ];
 }
@@ -10856,6 +10954,7 @@ message SetCustomLoginTextsRequest {
     zitadel.text.v1.PasswordlessRegistrationScreenText passwordless_registration_text = 33;
     zitadel.text.v1.PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
     zitadel.text.v1.ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
+    zitadel.text.v1.LinkingUserPromptScreenText linking_user_prompt_text = 36;
 }
 
 message SetCustomLoginTextsResponse {
@@ -13009,18 +13108,37 @@ message ClearFlowResponse {
 }
 
 message SetTriggerActionsRequest {
-    // id of the flow type
+    /* id of the flow type.
+    * Following flows are currently allowed:
+    * - External Authentication: FLOW_TYPE_EXTERNAL_AUTHENTICATION or 1
+    * - Internal Authentication: 3
+    * - Complement Token: 2
+    * - Complement SAML Response: 4
+    */ 
     string flow_type = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1\"";
-            description: "At the moment you have to send the ID of the Flow Type: ExternalAuthentication=1, CustomiseToken=2, InternalAuthentication=3, PreUserinfoCreation=3";
         }
     ];
-    // id of the trigger type
+    /* id of the trigger type.
+    * Following triggers are currently allowed:
+    * - External Authentication:
+    *   - Post Authentication: TRIGGER_TYPE_POST_AUTHENTICATION or 1
+    *   - Pre Creation: TRIGGER_TYPE_PRE_CREATION or 2
+    *   - Post Creation: TRIGGER_TYPE_POST_CREATION or 3 
+    * - Internal Authentication:
+    *   - Post Authentication: TRIGGER_TYPE_POST_AUTHENTICATION or 1
+    *   - Pre Creation: TRIGGER_TYPE_PRE_CREATION or 2
+    *   - Post Creation: TRIGGER_TYPE_POST_CREATION or 3 
+    * - Complement Token:
+    *   - Pre Userinfo Creation: 4
+    *   - Pre Access Token Creation: 5
+    * - Complement SAML Response:
+    *   - Pre SAML Response Creation: 6
+    */
     string trigger_type = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1\"";
-            description: "At the moment you have to send the ID of the Trigger Type: PostAuthentication=1, PreCreation=2, PostCreation=3, PreUserinfoCreation=4, PreAccessTokenCreation=5";
          }
     ];
     repeated string action_ids = 3;

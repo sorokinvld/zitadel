@@ -3,7 +3,6 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	auth_handler "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -18,8 +17,9 @@ import (
 )
 
 type Config struct {
-	SearchLimit uint64
-	Spooler     auth_handler.Config
+	SearchLimit                uint64
+	Spooler                    auth_handler.Config
+	AmountOfCachedAuthRequests uint16
 }
 
 type EsRepository struct {
@@ -38,8 +38,9 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 	}
 
 	auth_handler.Register(ctx, conf.Spooler, view, queries)
+	auth_handler.Start(ctx)
 
-	authReq := cache.Start(dbClient)
+	authReq := cache.Start(dbClient, conf.AmountOfCachedAuthRequests)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,
@@ -76,7 +77,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			ProjectProvider:           queryView,
 			ApplicationProvider:       queries,
 			CustomTextProvider:        queries,
-			FeatureCheck:              feature.NewCheck(esV2),
 			IdGenerator:               id.SonyFlakeGenerator(),
 		},
 		eventstore.TokenRepo{

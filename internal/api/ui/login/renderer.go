@@ -83,6 +83,7 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		tmplLDAPLogin:                    "ldap_login.html",
 		tmplDeviceAuthUserCode:           "device_usercode.html",
 		tmplDeviceAuthAction:             "device_action.html",
+		tmplLinkingUserPrompt:            "link_user_prompt.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -234,6 +235,9 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		},
 		"ldapUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLDAPCallback)
+		},
+		"linkingUserPromptUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointLinkingUserPrompt)
 		},
 	}
 	var err error
@@ -524,12 +528,12 @@ func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
 }
 
 func (l *Login) getPrivateLabelingID(r *http.Request, authReq *domain.AuthRequest) string {
-	defaultID := authz.GetInstance(r.Context()).DefaultOrganisationID()
-	f, err := l.featureCheck.CheckInstanceBooleanFeature(r.Context(), domain.FeatureLoginDefaultOrg)
-	logging.OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
-	if !f.Boolean {
-		defaultID = authz.GetInstance(r.Context()).InstanceID()
+	instance := authz.GetInstance(r.Context())
+	defaultID := instance.DefaultOrganisationID()
+	if !instance.Features().LoginDefaultOrg {
+		defaultID = instance.InstanceID()
 	}
+
 	if authReq != nil {
 		return authReq.PrivateLabelingOrgID(defaultID)
 	}
@@ -706,5 +710,5 @@ type mfaDoneData struct {
 type totpData struct {
 	Url    string
 	Secret string
-	QrCode string
+	QrCode template.HTML
 }

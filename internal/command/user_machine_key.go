@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -56,7 +57,7 @@ func (key *MachineKey) Detail() ([]byte, error) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "KEY-sp2l2m", "Errors.Internal")
 	}
 	if key.Type == domain.AuthNKeyTypeJSON {
-		return domain.MachineKeyMarshalJSON(key.KeyID, key.PrivateKey, key.AggregateID)
+		return domain.MachineKeyMarshalJSON(key.KeyID, key.PrivateKey, key.ExpirationDate, key.AggregateID)
 	}
 	return nil, zerrors.ThrowPreconditionFailed(nil, "KEY-dsg52", "Errors.Internal")
 }
@@ -77,6 +78,12 @@ func (key *MachineKey) content() error {
 func (key *MachineKey) valid() (err error) {
 	if err := key.content(); err != nil {
 		return err
+	}
+	// If a key is supplied, it should be a valid public key
+	if len(key.PublicKey) > 0 {
+		if _, err := crypto.BytesToPublicKey(key.PublicKey); err != nil {
+			return zerrors.ThrowInvalidArgument(nil, "COMMAND-5F3h1", "Errors.User.Machine.Key.Invalid")
+		}
 	}
 	key.ExpirationDate, err = domain.ValidateExpirationDate(key.ExpirationDate)
 	return err

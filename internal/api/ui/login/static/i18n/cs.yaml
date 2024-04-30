@@ -325,6 +325,12 @@ LogoutDone:
   Description: Byli jste úspěšně odhlášeni.
   LoginButtonText: Přihlásit se
 
+LinkingUserPrompt:
+  Title: Nalezen stávající uživatel
+  Description: "Chcete propojit svůj stávající účet:"
+  LinkButtonText: Odkaz
+  OtherButtonText: Jiné možnosti
+
 LinkingUsersDone:
   Title: Propojení uživatele
   Description: Uživatel propojen.
@@ -386,7 +392,7 @@ Errors:
   Internal: Došlo k interní chybě
   AuthRequest:
     NotFound: Authrequest nebyl nalezen
-    UserAgentNotCorresponding: User Agent neodpovídá
+    UserAgentNotCorresponding: User Agent nekoresponduje
     UserAgentNotFound: ID User Agenta nebylo nalezeno
     TokenNotFound: Token nebyl nalezen
     RequestTypeNotSupported: Typ požadavku není podporován

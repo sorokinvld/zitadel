@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -102,7 +101,8 @@ type InstanceSetup struct {
 		ThemeMode           domain.LabelPolicyThemeMode
 	}
 	LockoutPolicy struct {
-		MaxAttempts              uint64
+		MaxPasswordAttempts      uint64
+		MaxOTPAttempts           uint64
 		ShouldShowLockoutFailure bool
 	}
 	EmailTemplate     []byte
@@ -110,7 +110,7 @@ type InstanceSetup struct {
 	SMTPConfiguration *smtp.Config
 	OIDCSettings      *OIDCSettings
 	Quotas            *SetQuotas
-	Features          map[domain.Feature]any
+	Features          *InstanceFeatures
 	Limits            *SetLimits
 	Restrictions      *SetRestrictions
 }
@@ -127,7 +127,6 @@ type SetQuotas struct {
 }
 
 type SecretGenerators struct {
-	PasswordSaltCost         uint
 	ClientSecret             *crypto.GeneratorConfig
 	InitializeUserCode       *crypto.GeneratorConfig
 	EmailVerificationCode    *crypto.GeneratorConfig
@@ -209,7 +208,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user.NewAggregate(userID, orgID)
 	projectAgg := project.NewAggregate(setup.zitadel.projectID, orgID)
-	limitsAgg := limits.NewAggregate(setup.zitadel.limitsID, instanceID, instanceID)
+	limitsAgg := limits.NewAggregate(setup.zitadel.limitsID, instanceID)
 	restrictionsAgg := restrictions.NewAggregate(setup.zitadel.restrictionsID, instanceID, instanceID)
 
 	validations := []preparation.Validation{
@@ -273,7 +272,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink, setup.PrivacyPolicy.SupportEmail),
 		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
-		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
+		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxPasswordAttempts, setup.LockoutPolicy.MaxOTPAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
 		prepareAddDefaultLabelPolicy(
 			instanceAgg,
@@ -313,9 +312,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	setupCustomDomain(c, &validations, instanceAgg, setup.CustomDomain)
 	setupSMTPSettings(c, &validations, setup.SMTPConfiguration, instanceAgg)
 	setupOIDCSettings(c, &validations, setup.OIDCSettings, instanceAgg)
-	if err := setupFeatures(c, &validations, setup.Features, instanceID); err != nil {
-		return "", "", nil, nil, err
-	}
+	setupFeatures(&validations, setup.Features, instanceID)
 	setupLimits(c, &validations, limitsAgg, setup.Limits)
 	setupRestrictions(c, &validations, restrictionsAgg, setup.Restrictions)
 
@@ -368,20 +365,8 @@ func setupQuotas(commands *Commands, validations *[]preparation.Validation, setQ
 	return nil
 }
 
-func setupFeatures(commands *Commands, validations *[]preparation.Validation, enableFeatures map[domain.Feature]any, instanceID string) error {
-	for f, value := range enableFeatures {
-		switch v := value.(type) {
-		case bool:
-			wm, err := NewInstanceFeatureWriteModel[feature.Boolean](instanceID, f)
-			if err != nil {
-				return err
-			}
-			*validations = append(*validations, prepareSetFeature(wm, feature.Boolean{Boolean: v}, commands.idGenerator))
-		default:
-			return zerrors.ThrowInvalidArgument(nil, "INST-GE4tg", "Errors.Feature.TypeNotSupported")
-		}
-	}
-	return nil
+func setupFeatures(validations *[]preparation.Validation, features *InstanceFeatures, instanceID string) {
+	*validations = append(*validations, prepareSetFeatures(instanceID, features))
 }
 
 func setupOIDCSettings(commands *Commands, validations *[]preparation.Validation, oidcSettings *OIDCSettings, instanceAgg *instance.Aggregate) {
@@ -406,6 +391,7 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 	*validations = append(*validations,
 		commands.prepareAddSMTPConfig(
 			instanceAgg,
+			smtpConfig.Description,
 			smtpConfig.From,
 			smtpConfig.FromName,
 			smtpConfig.ReplyToAddress,
@@ -472,7 +458,6 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
 		commands.AddAPIAppCommand(
@@ -484,7 +469,6 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
 		commands.AddAPIAppCommand(
@@ -496,10 +480,9 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
-		commands.AddOIDCAppCommand(cnsl, nil),
+		commands.AddOIDCAppCommand(cnsl),
 		SetIAMConsoleID(instanceAgg, &cnsl.ClientID, &ids.consoleAppID),
 	)
 }
