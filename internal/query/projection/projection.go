@@ -77,6 +77,9 @@ var (
 	TargetProjection                    *handler.Handler
 	ExecutionProjection                 *handler.Handler
 	UserSchemaProjection                *handler.Handler
+
+	ProjectGrantFields      *handler.FieldHandler
+	OrgDomainVerifiedFields *handler.FieldHandler
 )
 
 type projection interface {
@@ -158,6 +161,10 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	TargetProjection = newTargetProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["targets"]))
 	ExecutionProjection = newExecutionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["executions"]))
 	UserSchemaProjection = newUserSchemaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_schemas"]))
+
+	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
+	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
+
 	newProjectionsList()
 	return nil
 }
@@ -179,6 +186,16 @@ func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
+}
+
+func ProjectInstance(ctx context.Context) error {
+	for _, projection := range projections {
+		_, err := projection.Trigger(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
@@ -269,8 +286,8 @@ func newProjectionsList() {
 		RestrictionsProjection,
 		SystemFeatureProjection,
 		InstanceFeatureProjection,
-		ExecutionProjection,
 		TargetProjection,
+		ExecutionProjection,
 		UserSchemaProjection,
 	}
 }
